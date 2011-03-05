@@ -1,0 +1,64 @@
+texdef -- Show definitions of TeX commands
+
+This perl script shows the definition of (La)TeX commands in a similar way as `\show`.
+
+
+Version 1.0 -- 2011/03/05
+Copyright (C) 2011  Martin Scharrer <martin@scharrer-online.de>
+This program comes with ABSOLUTELY NO WARRANTY;
+This is free software, and you are welcome to redistribute it under certain conditions;
+
+Usage:
+  texdef   [options] commandname [commandname ...]
+  latexdef [options] commandname [commandname ...]
+
+Other program names are possible. See the 'tex' option.  Command names do not need to start with `\`.
+
+Options:
+  --tex <flv>, -t <flv> : Use given flavour of TeX: 'tex', 'latex', 'context'.
+                          Variations of 'tex' and 'latex', like 'luatex', 'lualatex', 'xetex', 'xelatex' are supported.
+                          The default is given by the used program name: 'texdef' -> 'tex', 'latexdef' -> 'latex', etc.
+  --value, -v           : Show value of command instead (i.e. \the\command).
+  --preamble, -P        : Show definition of the command inside the preamble.
+  --beforeclass, -B     : Show definition of the command before \documentclass.
+  --package <pkg>, -p <pkg>     : (M) Load given tex-file, package or module depending on whether '*tex', '*latex'
+                                  or 'context' is used. For LaTeX the <pkg> can start with `[<options>]` and end 
+                                  with `<pkgname>` or `{<pkgname>}`.
+  --class <class>, -c <class>   : (LaTeX only) Load given class instead of default ('article').
+                                  The <class> can start with `[<classs options>]` and end 
+                                  with `<classname>` or `{<classname>}`.
+  --environment <env>, -p <env> : (M) Show definition inside the given environment <env>.
+  --othercode <code>, -o <code> : (M) Add other code into the preamble before the definition is shown.
+                                  This can be used to e.g. load PGF/TikZ libraries.
+  --before <code>, -b <code>    : (M) Place <code> before definition is shown.
+                                  The <code> can be arbitray TeX code and doesn't need be be balanced.
+  --after  <code>, -a <code>    : (M) Place <code> after definition is shown.
+                                  The <code> can be arbitray TeX code and doesn't need be be balanced.
+  --help, -h                    : Print this help and quit.
+
+ Long option can be shorten as long the are still unique.  Short options can be combined.
+ If the option 'environment', 'before' and 'after' are used toegether the
+ produced code will be inserted in the given order (reversed order for 'after').
+ (M) = This option can be given multiple times.
+
+Examples:
+Show the definition of '\chapter' with different classes ('article' (default), 'book' and 'scrbook'):
+
+    latexdef chapter
+    latexdef -c book chapter
+    latexdef -c scrbook chapter
+
+Show value of `\textwidth` with different class options:
+
+    latexdef -c [a4paper]{book} -v paperwidth
+    latexdef -c [letter]{book}  -v paperwidth
+
+Show definition of TikZ's '\draw' outside and inside a 'tikzpicture' environment:
+
+    latexdef -p tikz draw
+    latexdef -p tikz --env tikzpicture draw
+
+Show definition of TikZ's '\draw' inside a node, inside a 'beamer' frame in 'handout' mode:
+
+    latexdef -c [handout]beamer -p tikz --env frame --env tikzpicture -b '\node {' -a '};' draw
+

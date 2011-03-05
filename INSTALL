@@ -1,0 +1,55 @@
+Installation
+============
+
+Requirements
+------------
+
+The `texdef` program is a Perl script which needs a Perl interpreter to work.
+Informations about installing Perl can be found at http://www.perl.org/get.html.
+
+The script calls a TeX compiler (tex, latex, ...) to display the definition of commands/macros.
+Therefore (La)TeX must also be installed.
+Informations about installing (La)TeX can be found at http://www.latex-project.org/ftp.html.
+
+
+Location
+--------
+
+For installation the script 'texdef.pl' must simply be copied to a location suitable for executables,
+i.e. a directory in the PATHi, e.g. '/usr/bin' or '/usr/local/bin' for Linux/Unix.
+
+The script should be set as "executable", i.e. 'chmod +x texdef.pl' for Linux/Unix.
+This is not required for MS Windows.
+
+
+Name
+----
+
+This script can show the definitions of commands with different flavours of TeX
+(tex, etex, latex, pdftex, pdfetex, pdflatex, xetex, xelatex, context, ...).
+The flavour can be given using an command line option or over the _script name_,
+i.e. if the script is called 'texdef' it will use 'tex', but called 'latexdef'
+it will use 'latex' and so on.  
+The script can be simply copied several times, but creating _symbolic links_
+to the real script is enough on operation systems / file systems which support
+this.
+
+At least the two variations 'texdef' and 'latexdef' should be installed.
+
+
+Quick Install Nodes for Linux/Unix
+----------------------------------
+
+    cp texdef.pl /usr/local/bin/
+    cd /usr/local/bin
+    ln -s texdef.pl texdef
+    ln -s texdef.pl latexdef
+    ln -s texdef.pl etexdef
+    ln -s texdef.pl luatexdef
+    ln -s texdef.pl lualatexdef
+    ln -s texdef.pl pdftexdef
+    ln -s texdef.pl pdflatexdef
+    ln -s texdef.pl xetexdef
+    ln -s texdef.pl xelatexdef
+    ln -s texdef.pl 'some other TeX flavour of your choice'
+
