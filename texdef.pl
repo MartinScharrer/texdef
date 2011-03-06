@@ -158,7 +158,7 @@ $CLASS = $2;
 my $CLASSOPTIONS = $1 || '';
 
 
-my $TMPDIR  = tempdir( 'texdef_XXXXXX', CLEANUP => 1, TMPDIR => 1 );
+my $TMPDIR  = 'temp'; #tempdir( 'texdef_XXXXXX', CLEANUP => 1, TMPDIR => 1 );
 chdir $TMPDIR or die;
 my $TMPFILE = 'texdef.tex';
 
@@ -176,6 +176,10 @@ sub testdef {
             my $protectedmacro = $1;
             unshift @cmds, $protectedmacro;
         }
+        elsif ($macrodef =~ /^\\x\@protect (.*?) ?\\protect (.*?) ?$/) {
+            my $protectedmacro = $2;
+            unshift @cmds, $protectedmacro;
+        }
         elsif ($macrodef =~ /^\\\@protected\@testopt {?\\.*? }? *(\\\\.*?) /) {
             unshift @cmds, $1;
         }
@@ -191,12 +195,39 @@ sub testdef {
 
 while (my $cmd = shift @cmds) {
 
-$cmd =~ s/^([#^])?\\?//;
-my $type = $1 || '';
-my $showvalue  = $type eq '#';
-my $inpreamble = $type eq '^';
-$cmd =~ s/\s/\\space /;
+next if $cmd eq '';
+my $origcmd; 
+my $showvalue;
+my $inpreamble;
+my $bschar = 0;
+my $pcchar = 0;
+if (length ($cmd) > 1) {
+    $cmd =~ s/^([#^])?\\?//;
+    $origcmd = $cmd;
+    my $type = $1 || '';
+    $showvalue  = $type eq '#';
+    $inpreamble = $type eq '^';
+    $bschar = $cmd =~ s/\\/\\csname\0\@backslashchar\\endcsname\0/g;
+    $pcchar = $cmd =~ s/%/\\csname\0\@percentchar\\endcsname\0/g;
+}
+else {
+    $origcmd = $cmd;
+}
+$cmd =~ s/\s/\\space /g;
+$cmd =~ s/\0/ /g;
 
+
+sub special_chars {
+    return if (!$bschar && !$pcchar);
+    print '\begingroup'."\n";
+    if ($bschar) {
+        print '\lccode`x=92 \lowercase{\expandafter\gdef\csname @backslashchar\endcsname{x}}'."\n";
+    }
+    if ($pcchar) {
+        print '\lccode`x=37 \lowercase{\expandafter\gdef\csname @percentchar\endcsname{x}}'."\n";
+    }
+    print '\endgroup'."\n";
+}
 
 open (my $tmpfile, '>', $TMPFILE);
 select $tmpfile;
@@ -228,6 +259,7 @@ elsif ($ISCONTEXT) {
         local $, = "\n";
         print @OTHERDEFS, '';
     }
+    &special_chars();
     print "\\starttext\n" unless $inpreamble || $INPREAMBLE;
 }
 elsif ($ISTEX) {
@@ -238,6 +270,7 @@ elsif ($ISTEX) {
         local $, = "\n";
         print @OTHERDEFS, '';
     }
+    &special_chars();
 }
 
 foreach my $envc (@ENVCODE) {
@@ -251,15 +284,28 @@ foreach my $envc (@ENVCODE) {
 }
 
 print '\immediate\write0{==============================================================================}%'."\n";
+if (length ($cmd) > 1) {
 if ($showvalue || $SHOWVALUE) {
-    print '\immediate\write0{\string\the\expandafter\string\csname\string ', $cmd, '\endcsname}%'."\n";
+    print '\immediate\write0{\string\the\expandafter\string\csname ', $cmd, '\endcsname}%'."\n";
     print '\immediate\write0{------------------------------------------------------------------------------}%'."\n";
-    print '\immediate\write0{\expandafter\the\csname\string ', $cmd, '\endcsname}%'."\n";
+    print '\immediate\write0{\expandafter\the\csname ', $cmd, '\endcsname}%'."\n";
 } else {
     print '\begingroup';
-    print '\immediate\write0{\expandafter\string\csname\string ', $cmd, '\endcsname}%'."\n";
+    print '\immediate\write0{\expandafter\string\csname ', $cmd, '\endcsname}%'."\n";
     print '\immediate\write0{------------------------------------------------------------------------------}%'."\n";
-    print '\expandafter\endgroup\expandafter\immediate\expandafter\write\expandafter0\expandafter{\expandafter\meaning\csname\string ', $cmd, '\endcsname}%'."\n";
+    print '\expandafter\endgroup\expandafter\immediate\expandafter\write\expandafter0\expandafter{\expandafter\meaning\csname ', $cmd, '\endcsname}%'."\n";
+}
+}
+else {
+if ($showvalue || $SHOWVALUE) {
+    print '\immediate\write0{\string\the\string\\', $cmd, '}%'."\n";
+    print '\immediate\write0{------------------------------------------------------------------------------}%'."\n";
+    print '\immediate\write0{\the\\', $cmd, '}%'."\n";
+} else {
+    print '\immediate\write0{\string\\', $cmd, '}%'."\n";
+    print '\immediate\write0{------------------------------------------------------------------------------}%'."\n";
+    print '\immediate\write0{\meaning\\', $cmd, '}%'."\n";
+}
 }
 print '\immediate\write0{==============================================================================}%'."\n";
 
@@ -290,7 +336,7 @@ close ($tmpfile);
 
 select STDOUT;
 
-open (my $texpipe, '-|', "$TEX '-output-directory=$TMPDIR' '$TMPFILE' ");
+open (my $texpipe, '-|', "$TEX '$TMPFILE' ");
 
 my $name = '';
 my $definition = '';
@@ -354,7 +400,7 @@ print STDERR "\n(in preamble)" if $inpreamble;
 print STDERR "\n$name:\n$definition\n\n";
 
 
-testdef($cmd,$definition);
+testdef($origcmd,$definition);
 
 }
 
