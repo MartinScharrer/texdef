@@ -52,7 +52,7 @@ my $ENDENVSTR   = '%s';
 sub usage {
 print << 'EOT';
 texdef -- Show definitions of TeX commands
-Version 1.0 -- 2011/03/05
+Version 1.1 -- 2011/03/06
 Copyright (C) 2011  Martin Scharrer <martin@scharrer-online.de>
 This program comes with ABSOLUTELY NO WARRANTY;
 This is free software, and you are welcome to redistribute it under certain conditions;
@@ -158,7 +158,7 @@ $CLASS = $2;
 my $CLASSOPTIONS = $1 || '';
 
 
-my $TMPDIR  = 'temp'; #tempdir( 'texdef_XXXXXX', CLEANUP => 1, TMPDIR => 1 );
+my $TMPDIR  = tempdir( 'texdef_XXXXXX', CLEANUP => 1, TMPDIR => 1 );
 chdir $TMPDIR or die;
 my $TMPFILE = 'texdef.tex';
 
