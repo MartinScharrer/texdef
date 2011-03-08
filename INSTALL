@@ -53,3 +53,7 @@ Quick Install Nodes for Linux/Unix
     ln -s texdef.pl xelatexdef
     ln -s texdef.pl 'some other TeX flavour of your choice'
 
+or use the Makefile (defaults to `/usr/local/bin`)
+
+    make install INSTALLDIR=/your/path
+
