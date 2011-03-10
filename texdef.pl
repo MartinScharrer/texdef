@@ -396,8 +396,8 @@ if ($error) {
   next;
 }
 
-print STDERR "\n(in preamble)" if $inpreamble;
-print STDERR "\n$name:\n$definition\n\n";
+print "\n(in preamble)" if $inpreamble;
+print "\n$name:\n$definition\n\n";
 
 
 testdef($origcmd,$definition);
