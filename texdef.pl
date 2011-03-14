@@ -21,6 +21,7 @@ use strict;
 use warnings;
 use File::Temp qw/tempdir/; 
 use File::Basename;
+use Cwd;
 
 my ($scriptname) = fileparse($0, qw(\.pl \.perl));
 
@@ -157,6 +158,9 @@ $CLASS =~ /^(?:\[(.*)\])?{?(.*?)}?$/;
 $CLASS = $2;
 my $CLASSOPTIONS = $1 || '';
 
+
+my $cwd = getcwd();
+$ENV{TEXINPUTS} = $cwd . ':' . ($ENV{TEXINPUTS} || '');
 
 my $TMPDIR  = tempdir( 'texdef_XXXXXX', CLEANUP => 1, TMPDIR => 1 );
 chdir $TMPDIR or die;
@@ -404,6 +408,5 @@ testdef($origcmd,$definition);
 
 }
 
-chdir '/';
-chdir;
+chdir $cwd;
 __END__
