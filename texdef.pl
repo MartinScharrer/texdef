@@ -196,37 +196,13 @@ sub testdef {
     }
 }
 
-
-while (my $cmd = shift @cmds) {
-
-next if $cmd eq '';
-my $origcmd; 
-my $showvalue;
-my $inpreamble;
 my $bschar = 0;
 my $pcchar = 0;
 my $lbchar = 0;
 my $rbchar = 0;
-if (length ($cmd) > 1) {
-    $cmd =~ s/^([#^])?\\?//;
-    $origcmd = $cmd;
-    my $type = $1 || '';
-    $showvalue  = $type eq '#';
-    $inpreamble = $type eq '^';
-    $bschar = $cmd =~ s/\\/\\csname\0\@backslashchar\\endcsname\0/g;
-    $pcchar = $cmd =~ s/%/\\csname\0\@percentchar\\endcsname\0/g;
-    $lbchar = $cmd =~ s/{/\\csname\0\@charlb\\endcsname\0/g;
-    $rbchar = $cmd =~ s/}/\\csname\0\@charrb\\endcsname\0/g;
-}
-else {
-    $origcmd = $cmd;
-}
-$cmd =~ s/\s/\\space /g;
-$cmd =~ s/\0/ /g;
-
 
 sub special_chars {
-    return if (!$bschar && !$pcchar);
+    return if (!$bschar && !$pcchar && !$lbchar && !$rbchar);
     print '\begingroup'."\n";
     if ($bschar) {
         print '\lccode`.=92 \lowercase{\expandafter\gdef\csname @backslashchar\endcsname{.}}'."\n";
@@ -238,10 +214,31 @@ sub special_chars {
         print '\lccode`.=123 \lowercase{\expandafter\gdef\csname @charlb\endcsname{.}}'."\n";
     }
     if ($rbchar) {
-        print '\lccode`.=125 \lowercase{\expandafter\gdef\csname @charlb\endcsname{.}}'."\n";
+        print '\lccode`.=125 \lowercase{\expandafter\gdef\csname @charrb\endcsname{.}}'."\n";
     }
     print '\endgroup'."\n";
 }
+
+
+while (my $cmd = shift @cmds) {
+
+next if $cmd eq '';
+my $origcmd = $cmd; 
+my $showvalue;
+my $inpreamble;
+if (length ($cmd) > 1) {
+    $cmd =~ s/^([#^])?\\?//;
+    my $type = $1 || '';
+    $showvalue  = $type eq '#';
+    $inpreamble = $type eq '^';
+}
+$bschar = $cmd =~ s/\\/\\csname\0\@backslashchar\\endcsname\0/g;
+$pcchar = $cmd =~ s/\%/\\csname\0\@percentchar\\endcsname\0/g;
+$lbchar = $cmd =~ s/\{/\\csname\0\@charlb\\endcsname\0/g;
+$rbchar = $cmd =~ s/\}/\\csname\0\@charrb\\endcsname\0/g;
+$cmd =~ s/\s/\\space /g;
+$cmd =~ s/\0/ /g;
+
 
 open (my $tmpfile, '>', $TMPFILE);
 select $tmpfile;
