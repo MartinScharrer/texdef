@@ -205,6 +205,8 @@ my $showvalue;
 my $inpreamble;
 my $bschar = 0;
 my $pcchar = 0;
+my $lbchar = 0;
+my $rbchar = 0;
 if (length ($cmd) > 1) {
     $cmd =~ s/^([#^])?\\?//;
     $origcmd = $cmd;
@@ -213,6 +215,8 @@ if (length ($cmd) > 1) {
     $inpreamble = $type eq '^';
     $bschar = $cmd =~ s/\\/\\csname\0\@backslashchar\\endcsname\0/g;
     $pcchar = $cmd =~ s/%/\\csname\0\@percentchar\\endcsname\0/g;
+    $lbchar = $cmd =~ s/{/\\csname\0\@charlb\\endcsname\0/g;
+    $rbchar = $cmd =~ s/}/\\csname\0\@charrb\\endcsname\0/g;
 }
 else {
     $origcmd = $cmd;
@@ -225,10 +229,16 @@ sub special_chars {
     return if (!$bschar && !$pcchar);
     print '\begingroup'."\n";
     if ($bschar) {
-        print '\lccode`x=92 \lowercase{\expandafter\gdef\csname @backslashchar\endcsname{x}}'."\n";
+        print '\lccode`.=92 \lowercase{\expandafter\gdef\csname @backslashchar\endcsname{.}}'."\n";
     }
     if ($pcchar) {
-        print '\lccode`x=37 \lowercase{\expandafter\gdef\csname @percentchar\endcsname{x}}'."\n";
+        print '\lccode`.=37 \lowercase{\expandafter\gdef\csname @percentchar\endcsname{.}}'."\n";
+    }
+    if ($lbchar) {
+        print '\lccode`.=123 \lowercase{\expandafter\gdef\csname @charlb\endcsname{.}}'."\n";
+    }
+    if ($rbchar) {
+        print '\lccode`.=125 \lowercase{\expandafter\gdef\csname @charlb\endcsname{.}}'."\n";
     }
     print '\endgroup'."\n";
 }
