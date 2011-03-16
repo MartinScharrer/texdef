@@ -13,4 +13,9 @@ links:  ${LINKS}
 ${LINKS}:
 	ln -s texdef.pl $@
 
+release: zip
 
+zip: texdef.zip
+
+texdef.zip: texdef.pl README INSTALL
+	zip $@ $^
