@@ -275,7 +275,7 @@ elsif ($ISCONTEXT) {
 }
 elsif ($ISTEX) {
     foreach my $pkgname (@PACKAGES) {
-        print "\\input $pkgname.tex \n";
+        print "\\input $pkgname \n";
     }
     {
         local $, = "\n";
