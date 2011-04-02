@@ -246,7 +246,7 @@ select $tmpfile;
 print "\\nonstopmode\n";
 
 if ($ISLATEX) {
-    print "\\nofiles\n";
+    #print "\\nofiles\n";
     if (!$BEFORECLASS) {
         print "\\documentclass[$CLASSOPTIONS]{$CLASS}\n";
 
