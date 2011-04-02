@@ -54,7 +54,7 @@ my $ENDENVSTR   = '%s';
 sub usage {
 print << 'EOT';
 texdef -- Show definitions of TeX commands
-Version 1.1 -- 2011/03/16
+Version 1.2 -- 2011/04/02
 Copyright (C) 2011  Martin Scharrer <martin@scharrer-online.de>
 This program comes with ABSOLUTELY NO WARRANTY;
 This is free software, and you are welcome to redistribute it under certain conditions;
@@ -166,7 +166,7 @@ if ($FINDDEF && !$ISLATEX) { die "Error: The --find / -f option is only implemen
 my $cwd = getcwd();
 $ENV{TEXINPUTS} = $cwd . ':' . ($ENV{TEXINPUTS} || '');
 
-my $TMPDIR  = 'temp';#tempdir( 'texdef_XXXXXX', CLEANUP => 1, TMPDIR => 1 );
+my $TMPDIR  = tempdir( 'texdef_XXXXXX', CLEANUP => 1, TMPDIR => 1 );
 chdir $TMPDIR or die;
 my $TMPFILE = 'texdef.tex';
 
