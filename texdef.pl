@@ -36,14 +36,38 @@ my @OTHERDEFS  = ();
 my $INPREAMBLE = 0;
 my $SHOWVALUE  = 0;
 my $FINDDEF    = 0;
+my $LISTDEF    = 0;
+my $LISTDEFALL = 0;
 my $BEFORECLASS = 0;
 my @ENVCODE = ();
+my %DEFS;
+my $LISTSTR = '@TEXDEF@LISTDEFS@'; # used as a dummy command to list definitions
 
+my @IGNOREDEFREG = (# List of definitions to be ignored. Can be a regex or string
+   qr/^ver\@.*\.(?:sty|cls)$/,
+   qr/^opt\@.*\.(?:sty|cls)$/,
+   qr/^reserved\@[a-z]$/,
+   qr/-h\@\@k$/,
+   qr/^catcode\d+$/,
+   qr/^l\@ngrel\@x$/,
+   qr/^\@temp/,
+   qr/^KV\@/,
+   qr/^KVO\@/,
+   qr/^KVOdyn\@/,
+   qr/^KVS\@/,
+);
+my %IGNOREDEF = map { $_ => 1 } qw(
+   usepackage RequirePackage documentclass LoadClass  @classoptionslist
+   CurrentOption tracingassigns in@@ escapechar
+   @unprocessedoptions @let@token @gtempa @filelist @filef@und 
+   @declaredoptions @currnamestack @currname @currext
+   @ifdefinable default@ds ds@ @curroptions
+);
 use Getopt::Long;
 my $data = "file.dat";
 my $length = 24;
 my $verbose;
-  
+
 my $ISLATEX = 0;
 my $ISTEX   = 0;
 my $ISCONTEXT = 0;
@@ -71,6 +95,8 @@ Options:
                           The default is given by the used program name: 'texdef' -> 'tex', 'latexdef' -> 'latex', etc.
   --value, -v           : Show value of command instead (i.e. \the\command).
   --find, -f            : Find file where the command was defined (LaTeX only, requires 'filehook' and 'currfile' packages).
+  --list, -l            : List user definitions of the given packages.
+  --list-all, -L        : List all definitions of the given packages.
   --preamble, -P        : Show definition of the command inside the preamble.
   --beforeclass, -B     : Show definition of the command before \documentclass.
   --package <pkg>, -p <pkg>     : (M) Load given tex-file, package or module depending on whether '*tex', '*latex'
@@ -129,6 +155,8 @@ Getopt::Long::Configure ("bundling");
 GetOptions (
    'value|v!' => \$SHOWVALUE,
    'find|f!' => \$FINDDEF,
+   'list|l!' => \$LISTDEF,
+   'list-all|L!' => \$LISTDEFALL,
    'preamble|P!' => \$INPREAMBLE,
    'beforeclass|B!' => \$BEFORECLASS,
    'class|c=s' => \$CLASS,
@@ -166,11 +194,15 @@ if ($FINDDEF && !$ISLATEX) { die "Error: The --find / -f option is only implemen
 my $cwd = getcwd();
 $ENV{TEXINPUTS} = $cwd . ':' . ($ENV{TEXINPUTS} || '');
 
-my $TMPDIR  = tempdir( 'texdef_XXXXXX', CLEANUP => 1, TMPDIR => 1 );
+my $TMPDIR  = 'temp';#tempdir( 'texdef_XXXXXX', CLEANUP => 1, TMPDIR => 1 );
 chdir $TMPDIR or die;
 my $TMPFILE = 'texdef.tex';
 
 my @cmds = @ARGV;
+$LISTDEF = 1 if $LISTDEFALL;
+if ($LISTDEF) {
+    @cmds = ($LISTSTR);
+}
 
 sub testdef {
     my $cmd = shift;
@@ -252,18 +284,28 @@ print "\\nonstopmode\n";
 if ($ISLATEX) {
     #print "\\nofiles\n";
     if ($FINDDEF) {
+        # Load the 'filehook' and 'currfile' packages without 'kvoptions' by providing dummy definitions for the 'currfile' options:
+        print '\makeatletter\expandafter\def\csname ver@kvoptions.sty\endcsname{0000/00/00}\let\SetupKeyvalOptions\@gobble\newcommand\DeclareBoolOption[2][]{}\let\DeclareStringOption\DeclareBoolOption';
+        print '\let\DeclareVoidOption\@gobbletwo\def\ProcessKeyvalOptions{\@ifstar{}{}}';
+        print '\def\currfile@mainext{tex}\def\currfile@maindir{\@currdir}\let\ifcurrfile@fink\iffalse\makeatother';
         print "\\RequirePackage{filehook}\n";
         print "\\RequirePackage{currfile}\n";
-        print '{{\expandafter}\expandafter\ifx\csname ' . $cmd . '\expandafter\endcsname\csname @undefined\endcsname' . "\n";
+        print '\makeatletter\expandafter\let\csname ver@kvoptions.sty\endcsname\relax\let\SetupKeyvalOptions\@undefined\let\DeclareBoolOption\@undefined\let\DeclareStringOption\@undefined';
+        print '\let\DeclareVoidOption\@undefined\let\ProcessKeyvalOptions\@undefined\makeatother';
+        print '{\expandafter}\expandafter\ifx\csname ' . $cmd . '\expandafter\endcsname\csname @undefined\endcsname' . "\n";
         print '\AtEndOfFiles{{{\expandafter}\expandafter\ifx\csname ' . $cmd . '\expandafter\endcsname\csname @undefined\endcsname\else' . "\n";
         print '  \ClearHook\AtEndOfFiles{}\relax';
-        print '  \message{^^J:: \expandafter\string\csname '.$cmd.'\endcsname\space first defined in "\currfilename".^^J}\fi}}', "\n";
+        print '  {\message{^^J:: \expandafter\string\csname '.$cmd.'\endcsname\space first defined in "\currfilename".^^J}}\fi}}', "\n";
         print '\else'. "\n";
-        print '  \message{^^J:: \expandafter\string\csname '.$cmd.'\endcsname\space is defined by (La)TeX.^^J}', "\n";
-        print '\fi}'. "\n";
+        print '  {\message{^^J:: \expandafter\string\csname '.$cmd.'\endcsname\space is defined by (La)TeX.^^J}}', "\n";
+        print '\fi'. "\n";
     }
     if (!$BEFORECLASS) {
         print "\\documentclass[$CLASSOPTIONS]{$CLASS}\n";
+        if ($LISTDEF) {
+            print '\tracingonline=1\relax'. "\n";
+            print '\tracingassigns=1\relax'. "\n";
+        }
 
         foreach my $pkg (@PACKAGES) {
             $pkg =~ /^(?:\[(.*)\])?{?(.*?)}?$/;
@@ -274,7 +316,17 @@ if ($ISLATEX) {
             local $, = "\n";
             print @OTHERDEFS, '';
         }
-        print "\\begin{document}\n" unless $inpreamble || $INPREAMBLE;
+        unless ($inpreamble || $INPREAMBLE) {
+            print '\tracingonline=0\relax'. "\n";
+            print '\tracingassigns=0\relax'. "\n";
+            print "\\begin{document}\n";
+        }
+    }
+    else {
+        if ($LISTDEF) {
+            print '\tracingonline=1\relax'. "\n";
+            print '\tracingassigns=1\relax'. "\n";
+        }
     }
 }
 elsif ($ISCONTEXT) {
@@ -309,6 +361,8 @@ foreach my $envc (@ENVCODE) {
     }
 }
 
+if (!$LISTDEF) {
+
 print '\immediate\write0{==============================================================================}%'."\n";
 if (length ($cmd) > 1) {
 if ($showvalue || $SHOWVALUE) {
@@ -335,6 +389,8 @@ if ($showvalue || $SHOWVALUE) {
 }
 print '\immediate\write0{==============================================================================}%'."\n";
 
+}
+
 foreach my $envc (reverse @ENVCODE) {
     my ($envtype,$env) = @$envc;
     if ($envtype eq 'environment') {
@@ -347,7 +403,11 @@ foreach my $envc (reverse @ENVCODE) {
 
 if ($ISLATEX) {
     print "\\documentclass[$CLASSOPTIONS]{$CLASS}\n" if $BEFORECLASS;
-    print "\\begin{document}\n" if $inpreamble || $INPREAMBLE || $BEFORECLASS;
+    if ($inpreamble || $INPREAMBLE || $BEFORECLASS) {
+        print '\tracingonline=0\relax'. "\n";
+        print '\tracingassigns=0\relax'. "\n";
+        print "\\begin{document}\n" 
+    }
     print "\\end{document}\n";
 }
 elsif ($ISCONTEXT) {
@@ -370,6 +430,14 @@ my $errormsg = '';
 
 while (<$texpipe>) {
   print "$1\n" if /^::\s*(.*)/;
+  if ($LISTDEF && /^{into \s*(.*)}?$/) {
+    my ($cs, $def) = split (/=/, $1);
+    $cs =~ s/^\\//;
+    if ($LISTDEFALL || $cs !~ /[@ ]/) {
+        $DEFS{$cs} = $def;
+    }
+  }
+  last if /^=+$/;
   last if /^=+$/;
   if ($_ =~ /^!\s*(.*)/ && !$errormsg) {
     chomp;
@@ -423,9 +491,19 @@ if ($error) {
   next;
 }
 
-print "\n(in preamble)" if $inpreamble;
-print "\n$name:\n$definition\n\n";
-
+if ($cmd eq $LISTSTR) {
+    CMD:
+    foreach my $cmd (sort keys %DEFS) {
+        next CMD if exists $IGNOREDEF{$cmd};
+        foreach my $pattern (@IGNOREDEFREG) {
+            next CMD if $cmd =~ $pattern;
+        }
+        print "\\$cmd\n";
+    }
+} else {
+    print "\n(in preamble)" if $inpreamble;
+    print "\n$name:\n$definition\n\n";
+}
 
 testdef($origcmd,$definition);
 
