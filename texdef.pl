@@ -63,6 +63,7 @@ my @IGNOREDEFREG = (# List of definitions to be ignored. Can be a regex or strin
    qr/^filehook\@atbegin\@/,
    qr/^filehook\@atend\@/,
    qr/^count\d+$/,
+   qr/^pgfk@\//
 );
 my %IGNOREDEF = map { $_ => 1 } qw(
    usepackage RequirePackage documentclass LoadClass  @classoptionslist
@@ -70,7 +71,20 @@ my %IGNOREDEF = map { $_ => 1 } qw(
    @unprocessedoptions @let@token @gtempa @filelist @filef@und 
    @declaredoptions @currnamestack @currname @currext
    @ifdefinable default@ds ds@ @curroptions
+   filename@area filename@base filename@ext
 );
+sub addignore {
+  my $opt  = shift;
+  my $arg  = shift;
+  my @args = split (/,/, $arg);
+  if ($opt eq 'ignore-cmds') {
+    @IGNOREDEF{@args} = (1) x scalar @args;
+  }
+  else {
+    push @IGNOREDEFREG, map { qr/$_/ } @args;
+  }
+}
+
 use Getopt::Long;
 my $data = "file.dat";
 my $length = 24;
@@ -98,17 +112,12 @@ Usage:
 Other program names are possible. See the 'tex' option.  Command names do not need to start with `\`.
 
 Options:
-  --tex <flv>, -t <flv> : Use given flavour of TeX: 'tex', 'latex', 'context'.
-                          Variations of 'tex' and 'latex', like 'luatex', 'lualatex', 'xetex', 'xelatex' are supported.
-                          The default is given by the used program name: 'texdef' -> 'tex', 'latexdef' -> 'latex', etc.
-  --value, -v           : Show value of command instead (i.e. \the\command).
-  --find, -f            : Find file where the command was defined (L).
-  --list, -l            : List user level commands of the given packages (L).
-  --list-defs, -L       : List user level commands and their shorten definitions of the given packages (L).
-  --list-all, -ll       : List all commands of the given packages (L).
-  --list-defs-all, -LL  : List all commands and their shorten definitions of the given packages (L).
-  --preamble, -P        : Show definition of the command inside the preamble.
-  --beforeclass, -B     : Show definition of the command before \documentclass.
+  --tex <flv>, -t <flv>         : Use given flavour of TeX: 'tex', 'latex', 'context'.
+                                  Variations of 'tex' and 'latex', like 'luatex', 'lualatex', 'xetex', 'xelatex' are supported.
+                                  The default is given by the used program name: 'texdef' -> 'tex', 'latexdef' -> 'latex', etc.
+  --value, -v                   : Show value of command instead (i.e. \the\command).
+  --preamble, -P                : Show definition of the command inside the preamble.
+  --beforeclass, -B             : Show definition of the command before \documentclass.
   --package <pkg>, -p <pkg>     : (M) Load given tex-file, package or module depending on whether '*tex', '*latex'
                                   or 'context' is used. For LaTeX the <pkg> can start with `[<options>]` and end 
                                   with `<pkgname>` or `{<pkgname>}`.
@@ -122,6 +131,13 @@ Options:
                                   The <code> can be arbitray TeX code and doesn't need be be balanced.
   --after  <code>, -a <code>    : (M) Place <code> after definition is shown.
                                   The <code> can be arbitray TeX code and doesn't need be be balanced.
+  --find, -f                    : Find file where the command sequence was defined (L).
+  --list, -l                    : List user level command sequences of the given packages (L).
+  --list-defs, -L               : List user level command sequences and their shorten definitions of the given packages (L).
+  --list-all, -ll               : List all command sequences of the given packages (L).
+  --list-defs-all, -LL          : List all command sequences and their shorten definitions of the given packages (L).
+  --ignore-cmds <cs,cs,..>,  -i : Ignore the following command sequence(s) in the above lists. (M)
+  --ignore-regex <regex,..>, -I : Ignore all command sequences in the above lists which match the given Perl regular expression(s). (M)
   --help, -h                    : Print this help and quit.
 
  Long option can be shorten as long the are still unique.  Short options can be combined.
@@ -151,6 +167,10 @@ Show definition of TikZ's '\draw' inside a node, inside a 'beamer' frame in 'han
 
     latexdef -c [handout]beamer -p tikz --env frame --env tikzpicture -b '\node {' -a '};' draw
 
+List all user level command sequences (macros) defined by the 'xspace' LaTeX package:
+
+    latexdef -l -p xspace
+
 EOT
   exit (1);
 }
@@ -170,6 +190,8 @@ GetOptions (
    'list-def|L' => sub { $LISTCMDDEF++ },
    'list-all' => sub { $LISTCMD=2 },
    'list-def-all' => sub { $LISTCMDDEF=2 },
+   'ignore-cmds|i=s' => \&addignore,
+   'ignore-regex|I=s' => \&addignore,
    'no-list|no-l' => sub { $LISTCMD=0; $LISTCMDDEF=0; },
    'no-list-def|no-L' => sub { $LISTCMDDEF=0 },
    'no-list-all|no-ll' => sub { $LISTCMD=0; $LISTCMDDEF=0; },
@@ -217,6 +239,7 @@ my $TMPFILE = 'texdef.tex';
 
 my @cmds = @ARGV;
 $LISTCMD = $LISTCMDDEF if $LISTCMDDEF;
+if ($LISTCMD && !$ISLATEX) { die "Error: Listing for commands is only implemented for LaTeX!\n"; }
 if ($LISTCMD) {
     @cmds = ($LISTSTR);
 }
