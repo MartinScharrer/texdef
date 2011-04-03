@@ -36,12 +36,16 @@ my @OTHERDEFS  = ();
 my $INPREAMBLE = 0;
 my $SHOWVALUE  = 0;
 my $FINDDEF    = 0;
-my $LISTDEF    = 0;
-my $LISTDEFALL = 0;
+my $LISTCMD    = 0;
+my $LISTCMDDEF = 0;
 my $BEFORECLASS = 0;
 my @ENVCODE = ();
 my %DEFS;
 my $LISTSTR = '@TEXDEF@LISTDEFS@'; # used as a dummy command to list definitions
+my @FILES; # List of files (sty, cls, ...)
+my @FILEORDER; # Order of files
+my %ALIAS; # list of aliases; required for registers
+my $currfile = ''; # current file name
 
 my @IGNOREDEFREG = (# List of definitions to be ignored. Can be a regex or string
    qr/^ver\@.*\.(?:sty|cls)$/,
@@ -55,6 +59,10 @@ my @IGNOREDEFREG = (# List of definitions to be ignored. Can be a regex or strin
    qr/^KVO\@/,
    qr/^KVOdyn\@/,
    qr/^KVS\@/,
+   qr/^currfile/,
+   qr/^filehook\@atbegin\@/,
+   qr/^filehook\@atend\@/,
+   qr/^count\d+$/,
 );
 my %IGNOREDEF = map { $_ => 1 } qw(
    usepackage RequirePackage documentclass LoadClass  @classoptionslist
@@ -94,9 +102,11 @@ Options:
                           Variations of 'tex' and 'latex', like 'luatex', 'lualatex', 'xetex', 'xelatex' are supported.
                           The default is given by the used program name: 'texdef' -> 'tex', 'latexdef' -> 'latex', etc.
   --value, -v           : Show value of command instead (i.e. \the\command).
-  --find, -f            : Find file where the command was defined (LaTeX only, requires 'filehook' and 'currfile' packages).
-  --list, -l            : List user definitions of the given packages.
-  --list-all, -L        : List all definitions of the given packages.
+  --find, -f            : Find file where the command was defined (L).
+  --list, -l            : List user level commands of the given packages (L).
+  --list-defs, -L       : List user level commands and their shorten definitions of the given packages (L).
+  --list-all, -ll       : List all commands of the given packages (L).
+  --list-defs-all, -LL  : List all commands and their shorten definitions of the given packages (L).
   --preamble, -P        : Show definition of the command inside the preamble.
   --beforeclass, -B     : Show definition of the command before \documentclass.
   --package <pkg>, -p <pkg>     : (M) Load given tex-file, package or module depending on whether '*tex', '*latex'
@@ -118,6 +128,7 @@ Options:
  If the option 'environment', 'before' and 'after' are used toegether the
  produced code will be inserted in the given order (reversed order for 'after').
  (M) = This option can be given multiple times.
+ (L) = LaTeX only. Requires the packages 'filehook' and 'currfile'.
 
 Examples:
 Show the definition of '\chapter' with different classes ('article' (default), 'book' and 'scrbook'):
@@ -155,8 +166,14 @@ Getopt::Long::Configure ("bundling");
 GetOptions (
    'value|v!' => \$SHOWVALUE,
    'find|f!' => \$FINDDEF,
-   'list|l!' => \$LISTDEF,
-   'list-all|L!' => \$LISTDEFALL,
+   'list|l' => sub { $LISTCMD++ },
+   'list-def|L' => sub { $LISTCMDDEF++ },
+   'list-all' => sub { $LISTCMD=2 },
+   'list-def-all' => sub { $LISTCMDDEF=2 },
+   'no-list|no-l' => sub { $LISTCMD=0; $LISTCMDDEF=0; },
+   'no-list-def|no-L' => sub { $LISTCMDDEF=0 },
+   'no-list-all|no-ll' => sub { $LISTCMD=0; $LISTCMDDEF=0; },
+   'no-list-def-all|no-LL' => sub { $LISTCMDDEF=0 },
    'preamble|P!' => \$INPREAMBLE,
    'beforeclass|B!' => \$BEFORECLASS,
    'class|c=s' => \$CLASS,
@@ -199,8 +216,8 @@ chdir $TMPDIR or die;
 my $TMPFILE = 'texdef.tex';
 
 my @cmds = @ARGV;
-$LISTDEF = 1 if $LISTDEFALL;
-if ($LISTDEF) {
+$LISTCMD = $LISTCMDDEF if $LISTCMDDEF;
+if ($LISTCMD) {
     @cmds = ($LISTSTR);
 }
 
@@ -283,7 +300,7 @@ print "\\nonstopmode\n";
 
 if ($ISLATEX) {
     #print "\\nofiles\n";
-    if ($FINDDEF) {
+    if ($FINDDEF || $LISTCMD) {
         # Load the 'filehook' and 'currfile' packages without 'kvoptions' by providing dummy definitions for the 'currfile' options:
         print '\makeatletter\expandafter\def\csname ver@kvoptions.sty\endcsname{0000/00/00}\let\SetupKeyvalOptions\@gobble\newcommand\DeclareBoolOption[2][]{}\let\DeclareStringOption\DeclareBoolOption';
         print '\let\DeclareVoidOption\@gobbletwo\def\ProcessKeyvalOptions{\@ifstar{}{}}';
@@ -292,6 +309,8 @@ if ($ISLATEX) {
         print "\\RequirePackage{currfile}\n";
         print '\makeatletter\expandafter\let\csname ver@kvoptions.sty\endcsname\relax\let\SetupKeyvalOptions\@undefined\let\DeclareBoolOption\@undefined\let\DeclareStringOption\@undefined';
         print '\let\DeclareVoidOption\@undefined\let\ProcessKeyvalOptions\@undefined\makeatother';
+    }
+    if ($FINDDEF) {
         print '{\expandafter}\expandafter\ifx\csname ' . $cmd . '\expandafter\endcsname\csname @undefined\endcsname' . "\n";
         print '\AtEndOfFiles{{{\expandafter}\expandafter\ifx\csname ' . $cmd . '\expandafter\endcsname\csname @undefined\endcsname\else' . "\n";
         print '  \ClearHook\AtEndOfFiles{}\relax';
@@ -300,9 +319,13 @@ if ($ISLATEX) {
         print '  {\message{^^J:: \expandafter\string\csname '.$cmd.'\endcsname\space is defined by (La)TeX.^^J}}', "\n";
         print '\fi'. "\n";
     }
+    if ($LISTCMD) {
+        print '\AtBeginOfEveryFile{\message{^^J>> entering file "\currfilename"^^J}}'."\n";
+        print '\AtEndOfEveryFile{\message{^^J<< leaving file "\currfilename"^^J}}'."\n";
+    }
     if (!$BEFORECLASS) {
         print "\\documentclass[$CLASSOPTIONS]{$CLASS}\n";
-        if ($LISTDEF) {
+        if ($LISTCMD) {
             print '\tracingonline=1\relax'. "\n";
             print '\tracingassigns=1\relax'. "\n";
         }
@@ -323,7 +346,7 @@ if ($ISLATEX) {
         }
     }
     else {
-        if ($LISTDEF) {
+        if ($LISTCMD) {
             print '\tracingonline=1\relax'. "\n";
             print '\tracingassigns=1\relax'. "\n";
         }
@@ -361,7 +384,7 @@ foreach my $envc (@ENVCODE) {
     }
 }
 
-if (!$LISTDEF) {
+if (!$LISTCMD) {
 
 print '\immediate\write0{==============================================================================}%'."\n";
 if (length ($cmd) > 1) {
@@ -430,14 +453,30 @@ my $errormsg = '';
 
 while (<$texpipe>) {
   print "$1\n" if /^::\s*(.*)/;
-  if ($LISTDEF && /^{into \s*(.*)}?$/) {
-    my ($cs, $def) = split (/=/, $1);
+  if ($LISTCMD) {
+  if (/^>> entering file "(.*)"$/) {
+      push @FILES, $currfile;
+      $currfile = $1;
+      push @FILEORDER, $currfile if not exists $DEFS{$currfile};
+  }
+  elsif (/^<< leaving file "(.*)"$/) {
+      $currfile = pop @FILES;
+  }
+  elsif (/^{(?:into|reassigning) \s*(.*)}?$/) {
+    my ($cs, $def) = split (/=/, $1, 2);
     $cs =~ s/^\\//;
-    if ($LISTDEFALL || $cs !~ /[@ ]/) {
-        $DEFS{$cs} = $def;
+    $def =~ s/}$//;
+    if ($LISTCMD > 1 || $cs !~ /[@ ]/) {
+        if ($def =~ /^\\((?:skip|count|toks|muskip|box|dimen)\d+)$/) {
+            $ALIAS{$1} = $cs;
+        }
+        elsif (exists $ALIAS{$cs}) {
+            $cs = $ALIAS{$cs}
+        }
+        $DEFS{$currfile}{$cs} = $def;
     }
   }
-  last if /^=+$/;
+  }
   last if /^=+$/;
   if ($_ =~ /^!\s*(.*)/ && !$errormsg) {
     chomp;
@@ -492,13 +531,19 @@ if ($error) {
 }
 
 if ($cmd eq $LISTSTR) {
-    CMD:
-    foreach my $cmd (sort keys %DEFS) {
-        next CMD if exists $IGNOREDEF{$cmd};
-        foreach my $pattern (@IGNOREDEFREG) {
-            next CMD if $cmd =~ $pattern;
+    foreach $currfile (@FILEORDER) {
+        next if not keys %{$DEFS{$currfile}};
+        print "\nDefined by file '$currfile':\n";
+        CMD:
+        foreach my $cmd (sort keys %{$DEFS{$currfile}}) {
+            next CMD if exists $IGNOREDEF{$cmd};
+            foreach my $pattern (@IGNOREDEFREG) {
+                next CMD if $cmd =~ $pattern;
+            }
+            print "\\$cmd";
+            print ": $DEFS{$currfile}{$cmd}" if ($LISTCMDDEF);
+            print "\n";
         }
-        print "\\$cmd\n";
     }
 } else {
     print "\n(in preamble)" if $inpreamble;
