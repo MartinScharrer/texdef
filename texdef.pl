@@ -100,7 +100,7 @@ my $ENDENVSTR   = '%s';
 sub usage {
 print << 'EOT';
 texdef -- Show definitions of TeX commands
-Version 1.2 -- 2011/04/02
+Version 1.3 -- 2011/04/03
 Copyright (C) 2011  Martin Scharrer <martin@scharrer-online.de>
 This program comes with ABSOLUTELY NO WARRANTY;
 This is free software, and you are welcome to redistribute it under certain conditions;
