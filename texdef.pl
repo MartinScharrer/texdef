@@ -132,6 +132,7 @@ Options:
   --after  <code>, -a <code>    : (M) Place <code> after definition is shown.
                                   The <code> can be arbitray TeX code and doesn't need be be balanced.
   --find, -f                    : Find file where the command sequence was defined (L).
+  --Find, -F                    : Show full filepath of the file where the command sequence was defined (L).
   --list, -l                    : List user level command sequences of the given packages (L).
   --list-defs, -L               : List user level command sequences and their shorten definitions of the given packages (L).
   --list-all, -ll               : List all command sequences of the given packages (L).
@@ -185,7 +186,8 @@ sub envcode {
 Getopt::Long::Configure ("bundling");
 GetOptions (
    'value|v!' => \$SHOWVALUE,
-   'find|f!' => \$FINDDEF,
+   'find|f!' => sub { $FINDDEF = 1 },
+   'Find|F!' => sub { $FINDDEF = 2 },
    'list|l' => sub { $LISTCMD++ },
    'list-def|L' => sub { $LISTCMDDEF++ },
    'list-all' => sub { $LISTCMD=2 },
@@ -228,7 +230,8 @@ $CLASS =~ /^(?:\[(.*)\])?{?(.*?)}?$/;
 $CLASS = $2;
 my $CLASSOPTIONS = $1 || '';
 
-if ($FINDDEF && !$ISLATEX) { die "Error: The --find / -f option is only implemented for LaTeX!\n"; }
+if ($FINDDEF == 1 && !$ISLATEX) { die "Error: The --find / -f option is only implemented for LaTeX!\n"; }
+if ($FINDDEF == 2 && !$ISLATEX) { die "Error: The --Find / -F option is only implemented for LaTeX!\n"; }
 
 my $cwd = getcwd();
 $ENV{TEXINPUTS} = $cwd . ':' . ($ENV{TEXINPUTS} || '');
@@ -475,7 +478,17 @@ my $definition = '';
 my $errormsg = '';
 
 while (<$texpipe>) {
-  print "$1\n" if /^::\s*(.*)/;
+  if (/^::\s*(.*)/) {
+    my $line = $1;
+    if ($FINDDEF == 2) {
+        if ($line =~ /first defined in "(.*)"/) {
+            my $path = `kpsewhich "$1"`;
+            chomp $path;
+            $line =~ s/$1/$path/;
+        }
+    }
+    print "$line\n";
+  }
   if ($LISTCMD) {
   if (/^>> entering file "(.*)"$/) {
       push @FILES, $currfile;
@@ -488,7 +501,7 @@ while (<$texpipe>) {
   elsif (/^{(?:into|reassigning) \s*(.*)}?$/) {
     my ($cs, $def) = split (/=/, $1, 2);
     $cs =~ s/^\\//;
-    $def =~ s/}$//;
+    $def =~ s/\}$//;
     if ($LISTCMD > 1 || $cs !~ /[@ ]/) {
         if ($def =~ /^\\((?:skip|count|toks|muskip|box|dimen)\d+)$/) {
             $ALIAS{$1} = $cs;
