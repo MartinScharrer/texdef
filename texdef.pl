@@ -39,6 +39,7 @@ my $FINDDEF    = 0;
 my $LISTCMD    = 0;
 my $LISTCMDDEF = 0;
 my $BEFORECLASS = 0;
+my $PGFKEYS    = 0;
 my @ENVCODE = ();
 my %DEFS;
 my $LISTSTR = '@TEXDEF@LISTDEFS@'; # used as a dummy command to list definitions
@@ -139,6 +140,7 @@ Options:
   --list-defs-all, -LL          : List all command sequences and their shorten definitions of the given packages (L).
   --ignore-cmds <cs,cs,..>,  -i : Ignore the following command sequence(s) in the above lists. (M)
   --ignore-regex <regex,..>, -I : Ignore all command sequences in the above lists which match the given Perl regular expression(s). (M)
+  --pgf-keys, -k                : Takes commands as pgfkeys and displays their definitions. Keys must use the full path.
   --help, -h                    : Print this help and quit.
 
  Long option can be shorten as long the are still unique.  Short options can be combined.
@@ -208,6 +210,7 @@ GetOptions (
    'after|a=s' => \&envcode,
    'tex|t=s' => \$TEX,
    'help|h' => \&usage,
+   'pgf-keys|k' => \$PGFKEYS,
 ) || usage();
 
 if ($TEX =~ /latex$/) {
@@ -303,6 +306,10 @@ while (my $cmd = shift @cmds) {
 
 next if $cmd eq '';
 my $origcmd = $cmd; 
+if ($PGFKEYS) {
+    $cmd = "pgfk\@$cmd/.\@cmd";
+    push @PACKAGES, "pgfkeys";
+}
 my $showvalue;
 my $inpreamble;
 if (length ($cmd) > 1) {
