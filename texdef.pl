@@ -213,6 +213,8 @@ GetOptions (
    'pgf-keys|k' => \$PGFKEYS,
 ) || usage();
 
+usage() unless @ARGV;
+
 if ($TEX =~ /latex$/) {
   $ISLATEX = 1;
   $BEGINENVSTR = '\begin{%s}' . "\n";
