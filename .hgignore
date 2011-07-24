@@ -1,0 +1,19 @@
+syntax: glob
+.hgignore
+.svn
+?
+?.*
+*.aux
+*.fnd
+*.log
+*.out
+*.pdf
+*.tex
+*def
+temp
+temp/*
+*.zip
+*.tar.gz
+texput.*
+*.tdy
+*.bak*
