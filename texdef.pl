@@ -42,7 +42,8 @@ my $FINDDEF    = 0;
 my $LISTCMD    = 0;
 my $LISTCMDDEF = 0;
 my $BEFORECLASS = 0;
-my $PGFKEYS    = 0;
+my $PGFKEYS      = 0;
+my $PGFKEYSPLAIN = 0;
 my $FAKECMD    = "\0FAKECOMMAND\0";
 my @ENVCODE = ();
 my %DEFS;
@@ -145,7 +146,8 @@ Options:
   --list-defs-all, -LL          : List all command sequences and their shorten definitions of the given packages (L).
   --ignore-cmds <cs,cs,..>,  -i : Ignore the following command sequence(s) in the above lists. (M)
   --ignore-regex <regex,..>, -I : Ignore all command sequences in the above lists which match the given Perl regular expression(s). (M)
-  --pgf-keys, -k                : Takes commands as pgfkeys and displays their definitions. Keys must use the full path.
+  --pgf-keys, -k                : Takes commands as pgfkeys and displays their definitions. Keys must use the full path but the common '.\@cmd' prefix is applied.
+  --pgf-Keys, -K                : Takes commands as pgfkeys and displays their definitions. Keys must use the full path.
   --version, -V                 : If used alone prints version of this script.
                                   (L) Together with -p or -c prints version of LaTeX package(s) or class, respectively.
   --tempdir <directory>         : Use given existing directory for temporary files.
@@ -221,6 +223,7 @@ GetOptions (
    'tex|t=s' => \$TEX,
    'help|h' => \&usage,
    'pgf-keys|k' => \$PGFKEYS,
+   'pgf-Keys|K' => \$PGFKEYSPLAIN,
 ) || usage();
 
 # usage() unless @ARGV;
@@ -348,6 +351,10 @@ my $inpreamble;
 if ($cmd ne $FAKECMD) {
 if ($PGFKEYS) {
     $cmd = "pgfk\@$cmd/.\@cmd";
+    push @PACKAGES, "pgfkeys";
+}
+if ($PGFKEYSPLAIN) {
+    $cmd = "pgfk\@$cmd";
     push @PACKAGES, "pgfkeys";
 }
 if (length ($cmd) > 1) {
