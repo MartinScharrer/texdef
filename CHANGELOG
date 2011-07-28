@@ -1,0 +1,8 @@
+= Changelog =
+
+== v1.4 from  2011/07/28 ==
+ * Added -F option to display file path.
+ * Added basic support for pdfkeys using -k and -K options.
+ * Added -V option to print version numbers of LaTeX packages or classes.
+ * Added '--tempdir' option to specify the location of the temporary files. Useful for debugging.
+

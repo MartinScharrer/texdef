@@ -103,11 +103,11 @@ my $ISCONTEXT = 0;
 my $BEGINENVSTR = '%s';
 my $ENDENVSTR   = '%s';
 
-my $VERSION = 'Version 1.3 -- 2011/04/03';
+my $VERSION = 'Version 1.4 -- 2011/07/28';
 sub usage {
 print << 'EOT';
 texdef -- Show definitions of TeX commands
-Version 1.3 -- 2011/04/03
+Version 1.4 -- 2011/07/28
 Copyright (C) 2011  Martin Scharrer <martin@scharrer-online.de>
 This program comes with ABSOLUTELY NO WARRANTY;
 This is free software, and you are welcome to redistribute it under certain conditions;

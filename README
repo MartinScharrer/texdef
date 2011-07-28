@@ -2,7 +2,7 @@ texdef -- Show definitions of TeX commands
 
 This perl script shows the definition of (La)TeX commands in a similar way as `\show`.
 
-Version 1.3 -- 2011/04/03
+Version 1.4 -- 2011/07/28
 Copyright (C) 2011  Martin Scharrer <martin@scharrer-online.de>
 This program comes with ABSOLUTELY NO WARRANTY;
 This is free software, and you are welcome to redistribute it under certain conditions;
@@ -34,12 +34,18 @@ Options:
   --after  <code>, -a <code>    : (M) Place <code> after definition is shown.
                                   The <code> can be arbitray TeX code and doesn't need be be balanced.
   --find, -f                    : Find file where the command sequence was defined (L).
+  --Find, -F                    : Show full filepath of the file where the command sequence was defined (L).
   --list, -l                    : List user level command sequences of the given packages (L).
   --list-defs, -L               : List user level command sequences and their shorten definitions of the given packages (L).
   --list-all, -ll               : List all command sequences of the given packages (L).
   --list-defs-all, -LL          : List all command sequences and their shorten definitions of the given packages (L).
   --ignore-cmds <cs,cs,..>,  -i : Ignore the following command sequence(s) in the above lists. (M)
   --ignore-regex <regex,..>, -I : Ignore all command sequences in the above lists which match the given Perl regular expression(s). (M)
+  --pgf-keys, -k                : Takes commands as pgfkeys and displays their definitions. Keys must use the full path but the common '.\@cmd' prefix is applied.
+  --pgf-Keys, -K                : Takes commands as pgfkeys and displays their definitions. Keys must use the full path.
+  --version, -V                 : If used alone prints version of this script.
+                                  (L) Together with -p or -c prints version of LaTeX package(s) or class, respectively.
+  --tempdir <directory>         : Use given existing directory for temporary files.
   --help, -h                    : Print this help and quit.
 
  Long option can be shorten as long the are still unique.  Short options can be combined.
@@ -72,3 +78,4 @@ Show definition of TikZ's '\draw' inside a node, inside a 'beamer' frame in 'han
 List all user level command sequences (macros) defined by the 'xspace' LaTeX package:
 
     latexdef -l -p xspace
+
