@@ -36,6 +36,7 @@ my @PACKAGES   = ();
 my @OTHERDEFS  = ();
 my $INPREAMBLE = 0;
 my $PRINTVERSION = 0;
+my $TMPDIR     = '';
 my $SHOWVALUE  = 0;
 my $FINDDEF    = 0;
 my $LISTCMD    = 0;
@@ -147,6 +148,7 @@ Options:
   --pgf-keys, -k                : Takes commands as pgfkeys and displays their definitions. Keys must use the full path.
   --version, -V                 : If used alone prints version of this script.
                                   (L) Together with -p or -c prints version of LaTeX package(s) or class, respectively.
+  --tempdir <directory>         : Use given existing directory for temporary files.
   --help, -h                    : Print this help and quit.
 
  Long option can be shorten as long the are still unique.  Short options can be combined.
@@ -195,6 +197,7 @@ Getopt::Long::Configure ("bundling");
 GetOptions (
    'value|v!' => \$SHOWVALUE,
    'version|V!' => \$PRINTVERSION,
+   'tempdir=s' => \$TMPDIR,
    'find|f!' => sub { $FINDDEF = 1 },
    'Find|F!' => sub { $FINDDEF = 2 },
    'list|l' => sub { $LISTCMD++ },
@@ -250,8 +253,10 @@ if ($FINDDEF == 2 && !$ISLATEX) { die "Error: The --Find / -F option is only imp
 my $cwd = getcwd();
 $ENV{TEXINPUTS} = $cwd . ':' . ($ENV{TEXINPUTS} || '');
 
-my $TMPDIR  = 'temp';# tempdir( 'texdef_XXXXXX', CLEANUP => 1, TMPDIR => 1 );
-chdir $TMPDIR or die;
+if (!$TMPDIR) {
+   $TMPDIR = tempdir( 'texdef_XXXXXX', CLEANUP => 1, TMPDIR => 1 );
+}
+chdir $TMPDIR or die "Couldn't change into temporary directory '$TMPDIR'\n";
 my $TMPFILE = 'texdef.tex';
 
 my @cmds = @ARGV;
