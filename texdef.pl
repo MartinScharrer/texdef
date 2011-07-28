@@ -537,9 +537,16 @@ while (<$texpipe>) {
     print "$line\n";
     next;
   }
-  if (/^:TEXDEF:\s*(.*)/) {
+  if (/^(:TEXDEF:\s*(.*))/) {
     my $line = $1;
-    print "$line\n";
+    chomp ($line);
+    my $text = $2;
+    while (length $line >= 79) {
+        $line = <$texpipe>;
+        chomp ($line);
+        $text .= $line;
+    }
+    print "$text\n";
     next;
   }
   if ($LISTCMD) {
