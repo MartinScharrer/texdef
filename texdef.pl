@@ -250,15 +250,6 @@ my $CLASSOPTIONS = $1 || '';
 if ($FINDDEF == 1 && !$ISLATEX) { die "Error: The --find / -f option is only implemented for LaTeX!\n"; }
 if ($FINDDEF == 2 && !$ISLATEX) { die "Error: The --Find / -F option is only implemented for LaTeX!\n"; }
 
-my $cwd = getcwd();
-$ENV{TEXINPUTS} = $cwd . ':' . ($ENV{TEXINPUTS} || '');
-
-if (!$TMPDIR) {
-   $TMPDIR = tempdir( 'texdef_XXXXXX', CLEANUP => 1, TMPDIR => 1 );
-}
-chdir $TMPDIR or die "Couldn't change into temporary directory '$TMPDIR'\n";
-my $TMPFILE = 'texdef.tex';
-
 my @cmds = @ARGV;
 $LISTCMD = $LISTCMDDEF if $LISTCMDDEF;
 if ($LISTCMD && !$ISLATEX) { die "Error: Listing for commands is only implemented for LaTeX!\n"; }
@@ -268,8 +259,8 @@ if ($LISTCMD) {
 
 if ($PRINTVERSION) {
     if (!@PACKAGES && !$USERCLASS) {
-        print STDERR "$VERSION\n";
-        exit (0);
+        print STDERR "texdef: $VERSION\n";
+        exit (0) if not @cmds;
     }
     elsif (!@cmds) {
         @cmds = ($FAKECMD);
@@ -285,6 +276,17 @@ sub print_versions {
     }
     $PRINTVERSION = 0;# only print it once
 }
+
+usage() if not @cmds;
+my $cwd = getcwd();
+$ENV{TEXINPUTS} = '.:' . $cwd . ':' . ($ENV{TEXINPUTS} || '');
+
+if (!$TMPDIR) {
+   $TMPDIR = tempdir( 'texdef_XXXXXX', CLEANUP => 1, TMPDIR => 1 );
+}
+chdir $TMPDIR or die "Couldn't change into temporary directory '$TMPDIR'\n";
+my $TMPFILE = 'texdef.tex';
+
 
 sub testdef {
     my $cmd = shift;
@@ -336,7 +338,6 @@ sub special_chars {
     }
     print '\endgroup'."\n";
 }
-
 
 while (my $cmd = shift @cmds) {
 
