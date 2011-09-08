@@ -1,0 +1,192 @@
+\documentclass{ydoc}
+\usepackage{tabularx}
+
+\title{The \textsf{texdef} script}
+\author{Martin Scharrer}
+\email{martin@scharrer.me}
+\date{Version 1.4 -- 2011/07/28}
+
+\makeatletter
+\DeclareRobustCommand{\LATeX}{%
+    (L\kern -.36em{\sbox \z@ T\vbox to\ht \z@ {\hbox {\check@mathfonts \fontsize \sf@size \z@ \math@fontsfalse \selectfont A}\vss }}\kern -.075em)\kern -.15em\TeX
+}
+\makeatother
+
+\newenvironment{options}{%
+    \def\cstart{\begingroup\ttfamily\par\noindent\ignorespaces}%
+    \def\csep{\endgroup\begingroup\list {}{}\item \relax}%
+    \def\cend{\endlist\par\medskip\endgroup\cstart}%
+    \cstart
+}{%
+    \endgroup
+}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This perl script shows the definition of \LATeX\ commands in a similar way as the \TeX\ primitive \Macro\show.
+It is intended to allow users to quickly see the definitions of user level or internal package macros as well as the
+values of registers. The given commands are compiled internally with \LATeX\ and the output of \Macro\show is formatted
+and shown to the user.
+\end{abstract}
+
+\tableofcontents
+
+
+\section{Usage}
+The script executable is called \texttt{texdef} (or maybe \texttt{texdef.pl}).
+A normal installation is supposed to also install it as \texttt{latexdef} (e.g.\ using a symlink to \texttt{texdef}) in order to 
+allow for quick access to the \LaTeX\ format. Further format shortcuts are possible as explained in the installation section.
+
+\parindent=0pt
+\DescribeScript{texdef}[<options>]~<commandname>~[<commandname>~!\ldots!]
+\DescribeScript{latexdef}[<options>]~<commandname>~[<commandname>~!\ldots!]
+
+Other program names are possible. See the \texttt{tex} option.  Command names do not need to start with `|\|'.
+
+\subsection*{Options}
+The following options can be used:
+\par\medskip
+
+\begin{options}
+  --tex \MacroArgs<flv>, -t \MacroArgs<flv>          \csep Use given flavour of TeX: 'tex', 'latex', 'context'.
+                                                       Variations of 'tex' and 'latex', like 'luatex', 'lualatex', 'xetex', 'xelatex' are supported.
+                                                       The default is given by the used program name: 'texdef' -> 'tex', 'latexdef' -> 'latex', etc.\cend
+  --value, -v                                        \csep Show value of command instead (i.e. \Macro\the\AlsoMacro\command).\cend
+  --preamble, -P                                     \csep Show definition of the command inside the preamble.\cend
+  --beforeclass, -B                                  \csep Show definition of the command before \Macro\documentclass.\cend
+  --package \MacroArgs<pkg>, -p \MacroArgs<pkg>      \csep (M) Load given tex-file, package or module depending on whether '*tex', '*latex'
+                                                       or 'context' is used. For LaTeX the \MacroArgs<pkg> can start with `[<options>]` and end
+                                                       with \MacroArgs<pkgname> or \MacroArgs{<pkgname>}.\cend
+  --class \MacroArgs<class>, -c \MacroArgs<class>    \csep (LaTeX only) Load given class instead of default ('article').
+                                                       The \MacroArgs<class> can start with \MacroArgs[<class options>] and end
+                                                       with \MacroArgs<classname> or \MacroArgs{<classname>}.\cend
+  --environment \MacroArgs<env>, -p \MacroArgs<env>  \csep (M) Show definition inside the given environment \MacroArgs<env>.\cend
+  --othercode \MacroArgs<code>, -o \MacroArgs<code>  \csep (M) Add other code into the preamble before the definition is shown.
+                                                       This can be used to e.g. load PGF/TikZ libraries.\cend
+  --before \MacroArgs<code>, -b \MacroArgs<code>     \csep (M) Place \MacroArgs<code> before definition is shown.
+                                                       The \MacroArgs<code> can be arbitray TeX code and doesn't need be be balanced.\cend
+  --after  \MacroArgs<code>, -a \MacroArgs<code>     \csep (M) Place \MacroArgs<code> after definition is shown.
+                                                       The \MacroArgs<code> can be arbitray TeX code and doesn't need be be balanced.\cend
+  --find, -f                                         \csep Find file where the command sequence was defined (L).\cend
+  --Find, -F                                         \csep Show full filepath of the file where the command sequence was defined (L).\cend
+  --list, -l                                         \csep List user level command sequences of the given packages (L).\cend
+  --list-defs, -L                                    \csep List user level command sequences and their shorten definitions of the given packages (L).\cend
+  --list-all, -ll                                    \csep List all command sequences of the given packages (L).\cend
+  --list-defs-all, -LL                               \csep List all command sequences and their shorten definitions of the given packages (L).\cend
+  --ignore-cmds \MacroArgs<cs,cs,..>,  -i            \csep Ignore the following command sequence(s) in the above lists. (M)\cend
+  --ignore-regex \MacroArgs<regex,..>, -I            \csep Ignore all command sequences in the above lists which match the given Perl regular expression(s). (M)\cend
+  --pgf-keys, -k                                     \csep Takes commands as \pkg{pgfkeys} and displays their definitions. Keys must use the full path but the common '.\@cmd' prefix is applied.\cend
+  --pgf-Keys, -K                                     \csep Takes commands as \pkg{pgfkeys} and displays their definitions. Keys must use the full path.\cend
+  --version, -V                                      \csep If used alone prints version of this script.
+                                                       (L) Together with -p or -c prints version of LaTeX package(s) or class, respectively.\cend
+  --tempdir <directory>                              \csep Use given existing directory for temporary files.\cend
+  --help, -h                                         \csep Print this help and quit.\cend
+\end{options}
+
+\noindent \textbf{Notes:}\\
+ Long option can be shorten as long the are still unique.  Short options can be combined.
+ If the option 'environment', 'before' and 'after' are used toegether the
+ produced code will be inserted in the given order (reversed order for 'after').\\
+ (M) = This option can be given multiple times.\\
+ (L) = LaTeX only. Requires the packages 'filehook' and 'currfile'.
+
+
+\section{Installation}\label{sec:install}
+
+The latest official release of the script can be obtained from CTAN under \url{http://mirrors.ctan.org/support/texdef/texdef.pl}.
+The latest develop version (which can be unstable!) can be obtained from the source code repository under 
+\url{https://bitbucket.org/martin_scharrer/texdef/src/tip/texdef.pl}.
+
+For installation the script file |texdef.pl| must simply renamed to |texdef| and be copied to a location suitable for executables,
+i.e. a directory in the |PATH|, e.g.\ |/usr/bin| or |/usr/local/bin| for Linux/Unix.
+The script should be set as \emph{executable}, i.e. |chmod +x texdef.pl| for Linux/Unix.
+This is not required for MS Windows.
+
+This script can show the definitions of commands with different flavours of TeX
+(|tex|, |etex|, |latex|, |pdftex|, |pdfetex|, |pdflatex|, |xetex|, |xelatex|, |context|, \ldots).
+The flavour can be given using an command line option or over the \emph{script name},
+i.e.\ if the script is called |texdef| it will use |tex|, but called |latexdef|
+it will use |latex| and so on.
+The script can be simply copied several times, but creating \emph{symbolic links}
+to the real script is enough on operation systems/file systems which support
+this.
+At least the two variations |texdef| and |latexdef| should be installed.
+
+
+\subsection*{Requirements}
+
+The |texdef| program is a Perl script which needs a Perl interpreter to work.
+Informations about installing Perl can be found at \url{http://www.perl.org/get.html}.
+
+The script calls a TeX compiler (|tex|, |latex|, \ldots) to display the definition of commands/macros.
+Therefore \LATeX\ must also be installed.
+Informations about installing \LATeX\ can be found at \url{http://www.latex-project.org/ftp.html}.
+
+
+
+
+\subsection*{Quick Install Nodes for Linux/Unix}
+
+\begin{verbatim}
+    cp texdef.pl /usr/local/bin/
+    cd /usr/local/bin
+    ln -s texdef.pl texdef
+    ln -s texdef.pl latexdef
+    ln -s texdef.pl etexdef
+    ln -s texdef.pl luatexdef
+    ln -s texdef.pl lualatexdef
+    ln -s texdef.pl pdftexdef
+    ln -s texdef.pl pdflatexdef
+    ln -s texdef.pl xetexdef
+    ln -s texdef.pl xelatexdef
+    ln -s texdef.pl 'some other TeX flavour of your choice'
+\end{verbatim}
+
+\noindent or use the Makefile (defaults to |/usr/local/bin|)
+
+\begin{verbatim}
+    make install INSTALLDIR=/your/path
+\end{verbatim}
+
+\clearpage
+\section{Examples}
+Show the definition of \Macro\chapter with different classes (\cls{article} (default), \cls{book} and \cls{scrbook}):
+
+\begin{verbatim}
+latexdef chapter
+latexdef -c book chapter
+latexdef -c scrbook chapter
+\end{verbatim}
+
+Show value of \Macro\textwidth with different class options:
+
+\begin{verbatim}
+latexdef -c [a4paper]{book} -v paperwidth
+latexdef -c [letter]{book}  -v paperwidth
+\end{verbatim}
+
+Show definition of TikZ's \Macro\draw outside and inside a \env{tikzpicture} environment:
+
+\begin{verbatim}
+latexdef -p tikz draw
+latexdef -p tikz --env tikzpicture draw
+\end{verbatim}
+
+Show definition of TikZ's \Macro\draw inside a node, inside a \cls{beamer} frame in \opt{handout} mode:
+
+\begin{verbatim}
+latexdef -c [handout]beamer -p tikz --env frame \
+    --env tikzpicture -b '\node {' -a '};' draw
+\end{verbatim}
+
+List all user level command sequences (macros) defined by the \pkg{xspace} LaTeX package:
+
+\begin{verbatim}
+latexdef -l -p xspace
+\end{verbatim}
+
+
+\end{document}
+
