@@ -288,7 +288,7 @@ if (!$TMPDIR) {
    $TMPDIR = tempdir( 'texdef_XXXXXX', CLEANUP => 1, TMPDIR => 1 );
 }
 chdir $TMPDIR or die "Couldn't change into temporary directory '$TMPDIR'\n";
-my $TMPFILE = 'texdef.tex';
+my $TMPFILE = 'texdeftmp.tex';
 
 
 sub testdef {
@@ -525,7 +525,7 @@ close ($tmpfile);
 
 select STDOUT;
 
-open (my $texpipe, '-|', "$TEX '$TMPFILE' ");
+open (my $texpipe, '-|', "$TEX '$TMPDIR/$TMPFILE' ");
 
 my $name = '';
 my $definition = '';
