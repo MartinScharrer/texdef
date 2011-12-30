@@ -535,6 +535,11 @@ close ($tmpfile);
 
 select STDOUT;
 
+# Removes all '{' and '}' characters which no real braces.
+sub remove_invalid_braces {
+    $_[0] =~ s/%.*$//; # remove line comments
+    $_[0] =~ s/\\[{}]//; # remove \{ and \}
+}
 
 sub print_orig_def {
     my $rmacroname = shift;
@@ -563,11 +568,13 @@ sub print_orig_def {
             $found = 1;
             print "% $file, line $.:\n";
             print $line;
+            remove_invalid_braces $line;
             my $obrace = $line =~ tr/{/{/;
             my $cbrace = $line =~ tr/}/}/;
             while ($obrace != $cbrace) {
                 my $line = <$fh>;
                 print $line;
+                remove_invalid_braces $line;
                 $obrace += $line =~ tr/{/{/;
                 $cbrace += $line =~ tr/}/}/;
             }
