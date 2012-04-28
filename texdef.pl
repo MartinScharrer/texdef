@@ -29,6 +29,7 @@ my $TEX = 'pdflatex';
 if ($scriptname =~ /^(.*)def$/) {
     $TEX = $1;
 }
+my $TEXOPTIONS = " -interaction nonstopmode ";
 
 ## Variables for options and settings
 my $CLASS      = undef;
@@ -289,14 +290,20 @@ sub print_versions {
 
 usage() if not @cmds;
 my $cwd = getcwd();
-$ENV{TEXINPUTS} = '.:' . $cwd . ':' . ($ENV{TEXINPUTS} || '');
+my $OS = $^O;
+my $DIRSEP;
+if ($OS =~ /MSWin/) {
+	$DIRSEP = ';';
+} else {
+	$DIRSEP = ':';
+}
+$ENV{TEXINPUTS} = '.' . $DIRSEP . $cwd . $DIRSEP . ($ENV{TEXINPUTS} || '');
 
 if (!$TMPDIR) {
    $TMPDIR = tempdir( 'texdef_XXXXXX', CLEANUP => 1, TMPDIR => 1 );
 }
 chdir $TMPDIR or die "Couldn't change into temporary directory '$TMPDIR'\n";
 my $TMPFILE = 'texdeftmp.tex';
-
 
 sub testdef {
     my $cmd = shift;
@@ -586,8 +593,7 @@ sub print_orig_def {
     return $found;
 }
 
-
-open (my $texpipe, '-|', "$TEX '$TMPDIR/$TMPFILE' ");
+open (my $texpipe, '-|', "$TEX $TEXOPTIONS \"$TMPFILE\" ");
 
 my $name = '';
 my $definition = '';
