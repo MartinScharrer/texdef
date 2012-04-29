@@ -4,7 +4,7 @@
 \title{The \textsf{texdef} script}
 \author{Martin Scharrer}
 \email{martin@scharrer.me}
-\date{Version 1.4 -- 2011/07/28}
+\date{Version 1.5 -- 2011/04/29}
 
 \makeatletter
 \DeclareRobustCommand{\LATeX}{%
@@ -25,7 +25,7 @@
 \maketitle
 
 \begin{abstract}
-This perl script shows the definition of \LATeX\ commands in a similar way as the \TeX\ primitive \Macro\show.
+This Perl script shows the definition of \LATeX\ commands in a similar way as the \TeX\ primitive \Macro\show.
 It is intended to allow users to quickly see the definitions of user level or internal package macros as well as the
 values of registers. The given commands are compiled internally with \LATeX\ and the output of \Macro\show is formatted
 and shown to the user.
@@ -71,6 +71,7 @@ The following options can be used:
                                                        The \MacroArgs<code> can be arbitray TeX code and doesn't need be be balanced.\cend
   --find, -f                                         \csep Find file where the command sequence was defined (L).\cend
   --Find, -F                                         \csep Show full filepath of the file where the command sequence was defined (L).\cend
+  --source, -s                                       \csep Try to show the original source code of the command definition (L).\cend
   --list, -l                                         \csep List user level command sequences of the given packages (L).\cend
   --list-defs, -L                                    \csep List user level command sequences and their shorten definitions of the given packages (L).\cend
   --list-all, -ll                                    \csep List all command sequences of the given packages (L).\cend

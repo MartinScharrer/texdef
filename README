@@ -2,8 +2,8 @@ texdef -- Show definitions of TeX commands
 
 This perl script shows the definition of (La)TeX commands in a similar way as `\show`.
 
-Version 1.4 -- 2011/07/28
-Copyright (C) 2011  Martin Scharrer <martin@scharrer-online.de>
+Version 1.5 -- 2012/04/29
+Copyright (C) 2011-2012  Martin Scharrer <martin@scharrer-online.de>
 This program comes with ABSOLUTELY NO WARRANTY;
 This is free software, and you are welcome to redistribute it under certain conditions;
 

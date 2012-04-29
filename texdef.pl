@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 ################################################################################
 #  texdef -- Show definitions of TeX commands
-#  Copyright (c) 2011 Martin Scharrer <martin@scharrer-online.de>
+#  Copyright (c) 2011-2012 Martin Scharrer <martin@scharrer-online.de>
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -108,12 +108,12 @@ my $ISCONTEXT = 0;
 my $BEGINENVSTR = '%s';
 my $ENDENVSTR   = '%s';
 
-my $VERSION = 'Version 1.4 -- 2011/07/28';
+my $VERSION = 'Version 1.5 -- 2012/04/29';
 sub usage {
 print << 'EOT';
 texdef -- Show definitions of TeX commands
-Version 1.4 -- 2011/07/28
-Copyright (C) 2011  Martin Scharrer <martin@scharrer-online.de>
+Version 1.5 -- 2012/04/29
+Copyright (C) 2011-2012  Martin Scharrer <martin@scharrer-online.de>
 This program comes with ABSOLUTELY NO WARRANTY;
 This is free software, and you are welcome to redistribute it under certain conditions;
 
@@ -293,9 +293,9 @@ my $cwd = getcwd();
 my $OS = $^O;
 my $DIRSEP;
 if ($OS =~ /MSWin/) {
-	$DIRSEP = ';';
+    $DIRSEP = ';';
 } else {
-	$DIRSEP = ':';
+    $DIRSEP = ':';
 }
 $ENV{TEXINPUTS} = '.' . $DIRSEP . $cwd . $DIRSEP . ($ENV{TEXINPUTS} || '');
 
