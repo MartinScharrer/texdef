@@ -570,6 +570,17 @@ sub print_orig_def {
         $rmacroname                                              # Macro name without backslash
         [^a-zA-Z@]
         /xms;
+    my $rmacrolet  = qr/
+        ^                                                        # Begin of line (no whitespaces!)
+        \s*
+        (?:
+        (?:(?:\\global)\s*)*       # Prefixes (maybe with whitespace between them)
+        )
+        \\let \s* \\                                             # let
+        $rmacroname                                              # Macro name without backslash
+        \s* =?                                                   # Optional '='
+        \s* \\ ([a-zA-Z@]+)                                      # Second macro
+        /xms;
     while (my $line = <$fh>) {
         if ($line =~ $rmacrodef) {
             $found = 1;
@@ -586,6 +597,15 @@ sub print_orig_def {
                 $cbrace += $line =~ tr/}/}/;
             }
             print "\n";
+            last;
+        }
+        elsif ($line =~ $rmacrolet) {
+            my $letcmd = $1;
+            $found = 1;
+            print "% $file, line $.:\n";
+            print $line;
+            print "\n";
+            unshift @cmds, $letcmd;
             last;
         }
     }
