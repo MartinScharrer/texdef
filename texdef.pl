@@ -557,8 +557,28 @@ select STDOUT;
 
 # Removes all '{' and '}' characters which no real braces.
 sub remove_invalid_braces {
-    $_[0] =~ s/%.*$//; # remove line comments
-    $_[0] =~ s/\\[{}]//; # remove \{ and \}
+    $_[0] =~ s/\\[\\%]//g; # remove \\ and \%
+    $_[0] =~ s/%.*$//;     # remove line comments
+    $_[0] =~ s/\\[{}]//g;  # remove \{ and \}
+}
+
+sub env_braces {
+    my $line = shift;
+    remove_invalid_braces $line;
+    my $level = shift || 0;
+    my $count = shift || 0;
+    for my $char (split //, $line) {
+        if ($char eq '{') {
+            $level++;
+        }
+        elsif ($char eq '}') {
+            $level--;
+            if ($level == 0) {
+                $count++;
+            }
+        }
+    }
+    return ($level, $count);
 }
 
 sub print_orig_def {
@@ -594,6 +614,15 @@ sub print_orig_def {
         \s* =?                                                   # Optional '='
         \s* \\ ([a-zA-Z@]+)                                      # Second macro
         /xms;
+    my $renvdef = qr/
+        ^\s*                                                     # Begin of line (no whitespaces!)
+        \\(
+            (?:new|renew|provide)environment\s* { \s*            # LaTeX definitions
+        )
+        ($rmacroname)                                            # Environment names follow same rules as macro names
+        \s* }                                                    # closing brace
+        (.*)                                                     # Rest of line
+        /xms;
     while (my $line = <$fh>) {
         if ($line =~ $rmacrodef) {
             $found = 1;
@@ -619,6 +648,19 @@ sub print_orig_def {
             print $line;
             print "\n";
             unshift @cmds, $letcmd;
+            last;
+        }
+        elsif ($line =~ $renvdef) {
+            $found = 2;
+            print "% $file, line $.:\n";
+            print $line;
+            my ($level, $count) = env_braces $line;
+            while ($count < 3) {
+                my $line = <$fh>;
+                print $line;
+                ($level, $count) = env_braces $line, $level, $count;
+            }
+            print "\n";
             last;
         }
     }
