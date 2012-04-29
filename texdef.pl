@@ -40,6 +40,7 @@ my $INPREAMBLE = 0;
 my $PRINTVERSION = 0;
 my $TMPDIR     = '';
 my $SHOWVALUE  = 0;
+my $ISENVIRONMENT = 0;
 my $PRINTORIGDEF  = 0;
 my $FINDDEF    = 0;
 my $LISTCMD    = 0;
@@ -128,6 +129,8 @@ Options:
                                   Variations of 'tex' and 'latex', like 'luatex', 'lualatex', 'xetex', 'xelatex' are supported.
                                   The default is given by the used program name: 'texdef' -> 'tex', 'latexdef' -> 'latex', etc.
   --value, -v                   : Show value of command instead (i.e. \the\command).
+  --Environment, -E             : Every command name is taken as an environment name. This will show the definition of
+                                  both \Macro\foo and \Macro\endfoo if \texttt{foo} is used as command name (L).
   --preamble, -P                : Show definition of the command inside the preamble.
   --beforeclass, -B             : Show definition of the command before \documentclass.
   --package <pkg>, -p <pkg>     : (M) Load given tex-file, package or module depending on whether '*tex', '*latex'
@@ -136,7 +139,7 @@ Options:
   --class <class>, -c <class>   : (LaTeX only) Load given class instead of default ('article').
                                   The <class> can start with `[<classs options>]` and end 
                                   with `<classname>` or `{<classname>}`.
-  --environment <env>, -p <env> : (M) Show definition inside the given environment <env>.
+  --environment <env>, -e <env> : (M) Show definition inside the given environment <env>.
   --othercode <code>, -o <code> : (M) Add other code into the preamble before the definition is shown.
                                   This can be used to e.g. load PGF/TikZ libraries.
   --before <code>, -b <code>    : (M) Place <code> before definition is shown.
@@ -204,6 +207,7 @@ sub envcode {
 Getopt::Long::Configure ("bundling");
 GetOptions (
    'value|v!' => \$SHOWVALUE,
+   'Environment|E!' => \$ISENVIRONMENT,
    'version|V!' => \$PRINTVERSION,
    'tempdir=s' => \$TMPDIR,
    'find|f!' => sub { $FINDDEF = 1 },
@@ -289,6 +293,15 @@ sub print_versions {
 }
 
 usage() if not @cmds;
+
+if ($ISENVIRONMENT) {
+    my @ecmds;
+    for my $cmd (@cmds) {
+        push @ecmds, $cmd, 'end' . $cmd;
+    }
+    @cmds = @ecmds;
+}
+
 my $cwd = getcwd();
 my $OS = $^O;
 my $DIRSEP;
