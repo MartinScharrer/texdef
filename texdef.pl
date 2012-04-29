@@ -294,14 +294,6 @@ sub print_versions {
 
 usage() if not @cmds;
 
-if ($ISENVIRONMENT) {
-    my @ecmds;
-    for my $cmd (@cmds) {
-        push @ecmds, $cmd, 'end' . $cmd;
-    }
-    @cmds = @ecmds;
-}
-
 my $cwd = getcwd();
 my $OS = $^O;
 my $DIRSEP;
@@ -820,6 +812,9 @@ if ($cmd eq $LISTSTR) {
 }
 
 testdef($origcmd,$definition);
+if ($ISENVIRONMENT && $origdeffound < 2 && $cmd !~ /^end/) {
+    unshift @cmds, 'end' . $cmd;
+}
 
 }
 
