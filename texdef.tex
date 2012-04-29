@@ -50,7 +50,7 @@ The following options can be used:
 \par\medskip
 
 \begin{options}
-  --tex \MacroArgs<flv>, -t \MacroArgs<flv>          \csep Use given flavour of TeX: 'tex', 'latex', 'context'.
+  --tex \MacroArgs<format>, -t \MacroArgs<format>    \csep Use given format of TeX: 'tex', 'latex', 'context'.
                                                        Variations of 'tex' and 'latex', like 'luatex', 'lualatex', 'xetex', 'xelatex' are supported.
                                                        The default is given by the used program name: 'texdef' -> 'tex', 'latexdef' -> 'latex', etc.\cend
   --value, -v                                        \csep Show value of command instead (i.e. \Macro\the\AlsoMacro\command).\cend
@@ -105,9 +105,9 @@ i.e. a directory in the |PATH|, e.g.\ |/usr/bin| or |/usr/local/bin| for Linux/U
 The script should be set as \emph{executable}, i.e. |chmod +x texdef.pl| for Linux/Unix.
 This is not required for MS Windows.
 
-This script can show the definitions of commands with different flavours of TeX
+This script can show the definitions of commands with different formats of TeX
 (|tex|, |etex|, |latex|, |pdftex|, |pdfetex|, |pdflatex|, |xetex|, |xelatex|, |context|, \ldots).
-The flavour can be given using an command line option or over the \emph{script name},
+The format can be given using an command line option or over the \emph{script name},
 i.e.\ if the script is called |texdef| it will use |tex|, but called |latexdef|
 it will use |latex| and so on.
 The script can be simply copied several times, but creating \emph{symbolic links}
@@ -142,7 +142,7 @@ Informations about installing \LATeX\ can be found at \url{http://www.latex-proj
     ln -s texdef.pl pdflatexdef
     ln -s texdef.pl xetexdef
     ln -s texdef.pl xelatexdef
-    ln -s texdef.pl 'some other TeX flavour of your choice'
+    ln -s texdef.pl 'some other TeX format of your choice'
 \end{verbatim}
 
 \noindent or use the Makefile (defaults to |/usr/local/bin|)

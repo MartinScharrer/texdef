@@ -124,7 +124,7 @@ Usage:
 Other program names are possible. See the 'tex' option.  Command names do not need to start with `\`.
 
 Options:
-  --tex <flv>, -t <flv>         : Use given flavour of TeX: 'tex', 'latex', 'context'.
+  --tex <format>, -t <format>   : Use given format of TeX: 'tex', 'latex', 'context'.
                                   Variations of 'tex' and 'latex', like 'luatex', 'lualatex', 'xetex', 'xelatex' are supported.
                                   The default is given by the used program name: 'texdef' -> 'tex', 'latexdef' -> 'latex', etc.
   --value, -v                   : Show value of command instead (i.e. \the\command).
