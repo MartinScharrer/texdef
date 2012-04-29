@@ -598,6 +598,7 @@ open (my $texpipe, '-|', "$TEX $TEXOPTIONS \"$TMPFILE\" ");
 my $name = '';
 my $definition = '';
 my $errormsg = '';
+my $origdeffound = 0;
 
 while (<$texpipe>) {
   if (/^::\s*(.*)/) {
@@ -614,13 +615,18 @@ while (<$texpipe>) {
             my $file = $1;
             my $path = `kpsewhich "$file"`;
             chomp $path;
-            print_orig_def($cmd, $file, $path);
+            $origdeffound = print_orig_def($cmd, $file, $path);
         }
         elsif ($line =~ /is defined by \(La\)TeX./) {
             my $file = 'latex.ltx';
             my $path = `kpsewhich "$file"`;
             chomp $path;
-            print_orig_def($cmd, $file, $path);
+            $file = $path if $FINDDEF > 1;
+            $origdeffound = print_orig_def($cmd, $file, $path);
+        }
+        if (!$origdeffound) {
+            print "Source code definition of '$cmd' could not be found.\n";
+            print "$line\n";
         }
     }
     else {
@@ -733,7 +739,7 @@ if ($cmd eq $LISTSTR) {
             print "\n";
         }
     }
-} elsif (!$PRINTORIGDEF) {
+} elsif (!$PRINTORIGDEF || !$origdeffound) {
     print "\n(in preamble)" if $inpreamble;
     print "\n$name:\n$definition\n\n";
 }
