@@ -17,5 +17,8 @@ release: zip
 
 zip: texdef.zip
 
-texdef.zip: texdef.pl README INSTALL
+texdef.zip: texdef.pl README INSTALL texdef.pdf texdef.tex
 	zip $@ $^
+
+%.pdf: %.tex
+	latexmk -pdf $<

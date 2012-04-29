@@ -1,5 +1,9 @@
 = Changelog =
 
+== v1.5 from  2012/04/29 ==
+ * Added experimental --source option to show source code of the definitions.
+ * Script now works correctly under MS Windows.
+
 == v1.4 from  2011/07/28 ==
  * Added -F option to display file path.
  * Added basic support for pdfkeys using -k and -K options.
