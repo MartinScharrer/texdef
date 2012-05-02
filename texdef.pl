@@ -109,11 +109,11 @@ my $ISCONTEXT = 0;
 my $BEGINENVSTR = '%s';
 my $ENDENVSTR   = '%s';
 
-my $VERSION = 'Version 1.5 -- 2012/04/29';
+my $VERSION = 'Version 1.6 -- 2012/05/02';
 sub usage {
 print << 'EOT';
 texdef -- Show definitions of TeX commands
-Version 1.5 -- 2012/04/29
+Version 1.6 -- 2012/05/02
 Copyright (C) 2011-2012  Martin Scharrer <martin@scharrer-online.de>
 This program comes with ABSOLUTELY NO WARRANTY;
 This is free software, and you are welcome to redistribute it under certain conditions;
@@ -128,6 +128,7 @@ Options:
   --tex <format>, -t <format>   : Use given format of TeX: 'tex', 'latex', 'context'.
                                   Variations of 'tex' and 'latex', like 'luatex', 'lualatex', 'xetex', 'xelatex' are supported.
                                   The default is given by the used program name: 'texdef' -> 'tex', 'latexdef' -> 'latex', etc.
+  --source, -s                  : Try to show the original source code of the command definition (L).
   --value, -v                   : Show value of command instead (i.e. \the\command).
   --Environment, -E             : Every command name is taken as an environment name. This will show the definition of
                                   both \Macro\foo and \Macro\endfoo if \texttt{foo} is used as command name (L).
@@ -148,7 +149,6 @@ Options:
                                   The <code> can be arbitray TeX code and doesn't need be be balanced.
   --find, -f                    : Find file where the command sequence was defined (L).
   --Find, -F                    : Show full filepath of the file where the command sequence was defined (L).
-  --source, -s                  : Try to show the original source code of the command definition (L).
   --list, -l                    : List user level command sequences of the given packages (L).
   --list-defs, -L               : List user level command sequences and their shorten definitions of the given packages (L).
   --list-all, -ll               : List all command sequences of the given packages (L).

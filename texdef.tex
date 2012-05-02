@@ -3,8 +3,9 @@
 
 \title{The \textsf{texdef} script}
 \author{Martin Scharrer}
-\email{martin@scharrer.me}
-\date{Version 1.5 -- 2011/04/29}
+\email{martin@scharrer-online.de}
+\repository{https://bitbucket.org/martin_scharrer/texdef}
+\date{Version 1.6 -- 2011/05/02}
 
 \makeatletter
 \DeclareRobustCommand{\LATeX}{%
@@ -53,8 +54,11 @@ The following options can be used:
   --tex \MacroArgs<format>, -t \MacroArgs<format>    \csep Use given format of TeX: 'tex', 'latex', 'context'.
                                                        Variations of 'tex' and 'latex', like 'luatex', 'lualatex', 'xetex', 'xelatex' are supported.
                                                        The default is given by the used program name: 'texdef' -> 'tex', 'latexdef' -> 'latex', etc.\cend
+  --source, -s                                       \csep Try to show the original source code of the command definition (L).\cend
   --value, -v                                        \csep Show value of command instead (i.e. \Macro\the\AlsoMacro\command).\cend
   --preamble, -P                                     \csep Show definition of the command inside the preamble.\cend
+  --Environment, -E                                  \csep Every command name is taken as an environment name. This will show the definition of
+                                                             both \Macro\foo and \Macro\endfoo if \texttt{foo} is used as command name (L).\cend
   --beforeclass, -B                                  \csep Show definition of the command before \Macro\documentclass.\cend
   --package \MacroArgs<pkg>, -p \MacroArgs<pkg>      \csep (M) Load given tex-file, package or module depending on whether '*tex', '*latex'
                                                        or 'context' is used. For LaTeX the \MacroArgs<pkg> can start with `[<options>]` and end
@@ -71,7 +75,6 @@ The following options can be used:
                                                        The \MacroArgs<code> can be arbitray TeX code and doesn't need be be balanced.\cend
   --find, -f                                         \csep Find file where the command sequence was defined (L).\cend
   --Find, -F                                         \csep Show full filepath of the file where the command sequence was defined (L).\cend
-  --source, -s                                       \csep Try to show the original source code of the command definition (L).\cend
   --list, -l                                         \csep List user level command sequences of the given packages (L).\cend
   --list-defs, -L                                    \csep List user level command sequences and their shorten definitions of the given packages (L).\cend
   --list-all, -ll                                    \csep List all command sequences of the given packages (L).\cend
@@ -151,7 +154,6 @@ Informations about installing \LATeX\ can be found at \url{http://www.latex-proj
     make install INSTALLDIR=/your/path
 \end{verbatim}
 
-\clearpage
 \section{Examples}
 Show the definition of \Macro\chapter with different classes (\cls{article} (default), \cls{book} and \cls{scrbook}):
 
