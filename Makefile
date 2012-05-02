@@ -5,7 +5,8 @@ DIRECTORY     = /macros/latex/contrib/${CONTRIBUTION}
 LICENSE       = free
 FREEVERSION   = gpl
 CTAN_FILE     = ${CONTRIBUTION}.zip
-export CONTRIBUTION VERSION NAME EMAIL SUMMARY DIRECTORY DONOTANNOUNCE ANNOUNCE NOTES LICENSE FREEVERSION CTAN_FILE
+CTAN_SERVER   = dante
+export CONTRIBUTION VERSION NAME EMAIL SUMMARY DIRECTORY DONOTANNOUNCE ANNOUNCE NOTES LICENSE FREEVERSION CTAN_FILE CTAN_SERVER
 
 SCRIPTFILES   = ${CONTRIBUTION}.pl
 SCRDOCFILES   = ${CONTRIBUTION}.pdf README INSTALL
@@ -27,7 +28,7 @@ BUILDDIR = .
 LATEXMK  = latexmk -pdf -quiet
 ZIP      = zip -r
 WEBBROWSER = firefox
-GETVERSION = $(strip $(shell grep '=\*VERSION' -A1 ${MAINDTXS} | tail -n1))
+GETVERSION = $(strip $(shell grep 'my \$$VERSION' texdef.pl | sed 's/my \$$VERSION = '\''Version \(.*\) -- .*'\'';/v\1/') )
 
 AUXEXTS  = .aux .bbl .blg .cod .exa .fdb_latexmk .glo .gls .lof .log .lot .out .pdf .que .run.xml .sta .stp .svn .svt .toc
 CLEANFILES = $(addprefix ${CONTRIBUTION}, ${AUXEXTS})
@@ -45,13 +46,13 @@ build: doc
 	touch $@
 
 clean:
-	latexmk -C ${SCRDOCFILES}
+	latexmk -C ${SCRSRCFILES}
 	${RM} ${CLEANFILES}
 	${RM} -r ${TDSDIR} ${TDSZIP} ${CTAN_FILE}
 
 
 distclean:
-	latexmk -C ${SCRDOCFILES}
+	latexmk -C ${SCRSRCFILES}
 	${RM} ${CLEANFILES}
 	${RM} -r ${TDSDIR}
 
