@@ -692,7 +692,7 @@ while (<$texpipe>) {
             $origdeffound = print_orig_def($cmd, $file, $path);
         }
         if (!$origdeffound) {
-            print "Source code definition of '$cmd' could not be found.\n";
+            print "Source code definition of '$origcmd' could not be found.\n";
             print "$line\n";
         }
     }
@@ -811,7 +811,9 @@ if ($cmd eq $LISTSTR) {
     print "\n$name:\n$definition\n\n";
 }
 
-testdef($origcmd,$definition);
+if (!($PRINTORIGDEF && $origdeffound)) {
+    testdef($origcmd,$definition);
+}
 if ($ISENVIRONMENT && $origdeffound < 2 && $cmd !~ /^end/) {
     unshift @cmds, 'end' . $cmd;
 }
