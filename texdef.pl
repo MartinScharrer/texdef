@@ -165,6 +165,11 @@ Options:
   --pgf-Keys, -K                : Takes commands as pgfkeys and displays their definitions. Keys must use the full path.
   --version, -V                 : If used alone prints version of this script.
                                   (L) Together with -p or -c prints version of LaTeX package(s) or class, respectively.
+  --edit                        : Opens the file holding the macro definition. Uses --Find and --source. (L)
+                                  If the source definition can not be found the definition is printed as normal instead.
+  --editor <editor>             : Can be used to set the used editor. Can include '%f' for the filename, '%n' for the
+                                  line number and '%%' for a literal '%'. If no '%' is used '+%n %f' is added to the
+                                  given command.
   --tempdir <directory>         : Use given existing directory for temporary files.
   --help, -h                    : Print this help and quit.
 
