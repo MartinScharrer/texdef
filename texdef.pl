@@ -52,7 +52,6 @@ my $FAKECMD    = "\0FAKECOMMAND\0";
 my $EDIT = 0;
 my $EDITOR;
 my $EDITORCMDLN;
-my $EDITORNOLN = 0;
 my @ENVCODE = ();
 my %DEFS;
 my $LISTSTR = '@TEXDEF@LISTDEFS@'; # used as a dummy command to list definitions
@@ -251,6 +250,7 @@ GetOptions (
 if ($EDIT && !$EDITOR) {
     $EDITOR = $ENV{'EDITOR'} || $ENV{'SELECTED_EDITOR'};
     if (!$EDITOR) {
+        if (!$WINDOWS) {
         # Check ~/.selected_editor file (Ubuntu)
         my $fn = "$ENV{HOME}/.selected_editor";
         if (-r $fn) {
@@ -263,12 +263,12 @@ if ($EDIT && !$EDITOR) {
             }
             close ($fh);
         }
+        }
     }
     if (!$EDITOR) {
         warn "No editor set. Using default!\n";
         if ($WINDOWS) {
-            $EDITOR = 'notepad';
-            $EDITORNOLN = 1;
+            $EDITOR = 'notepad "%f"';
         }
         else {
             for my $ed (qw(/usr/bin/editor /usr/bin/vim /usr/bin/emacs /usr/bin/nano)) {
@@ -622,9 +622,14 @@ sub call_editor {
     my $path = shift;
     my $linenumber = shift;
     print "Opening file '$path', line $linenumber.\n";
-    if ($EDITORNOLN) {
-        system($EDITOR, $path);
-    } else {
+    if ($EDITOR =~ /%/) {
+        $EDITOR =~ s/%%/\000/;
+        $EDITOR =~ s/%f/$path/;
+        $EDITOR =~ s/%n/$linenumber/;
+        $EDITOR =~ s/\000/%/;
+        system($EDITOR);
+    }
+    else {
         system($EDITOR, "+$linenumber", $path);
     }
 }
