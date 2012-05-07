@@ -472,7 +472,15 @@ if ($ISLATEX) {
     }
     if ($FINDDEF || $PRINTORIGDEF) {
         print '{\expandafter}\expandafter\ifx\csname ' . $cmd . '\expandafter\endcsname\csname @undefined\endcsname' . "\n";
+        print '\AtBeginOfFiles{{{\expandafter}\expandafter\ifx\csname ' . $cmd . '\expandafter\endcsname\csname @undefined\endcsname\else' . "\n";
+        print '  \ClearHook\AtBeginOfFiles{}\relax';
+        print '  \ClearHook\AtEndOfFiles{}\relax';
+        # Get parent filename
+        print '  \csname currfile@pop\endcsname';
+        print '  {\message{^^J:: \expandafter\string\csname '.$cmd.'\endcsname\space first defined in "\currfilename".^^J}}\fi}}', "\n";
+        print '  \csname currfile@push\endcsname';
         print '\AtEndOfFiles{{{\expandafter}\expandafter\ifx\csname ' . $cmd . '\expandafter\endcsname\csname @undefined\endcsname\else' . "\n";
+        print '  \ClearHook\AtBeginOfFiles{}\relax';
         print '  \ClearHook\AtEndOfFiles{}\relax';
         print '  {\message{^^J:: \expandafter\string\csname '.$cmd.'\endcsname\space first defined in "\currfilename".^^J}}\fi}}', "\n";
         print '\else'. "\n";
