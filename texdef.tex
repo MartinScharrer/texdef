@@ -5,7 +5,7 @@
 \author{Martin Scharrer}
 \email{martin@scharrer-online.de}
 \repository{https://bitbucket.org/martin_scharrer/texdef}
-\date{Version 1.6 -- 2011/05/02}
+\date{Version 1.7 -- 2011/05/07}
 
 \makeatletter
 \DeclareRobustCommand{\LATeX}{%
@@ -85,6 +85,13 @@ The following options can be used:
   --pgf-Keys, -K                                     \csep Takes commands as \pkg{pgfkeys} and displays their definitions. Keys must use the full path.\cend
   --version, -V                                      \csep If used alone prints version of this script.
                                                        (L) Together with -p or -c prints version of LaTeX package(s) or class, respectively.\cend
+  --edit                                             \csep Opens the file holding the macro definition. Uses |--Find| and |--source|.
+                                                           If the source definition can not be found the definition is printed as normal instead. (L)\cend
+  --editor <editor>                                  \csep Can be used to set the used editor. If not used the environment variables |TEXDEF_EDITOR|, |EDITOR| and
+                                                       |SELECTED_EDITOR| are read in this order. If none of these are set a list of default
+                                                       editors are tried.  The |<editor>| string can include `|%f|' for the filename, `|%n|' for
+                                                       the line number and `|%%|' for a literal `|%|'.  If no `|%|' is used `|+%n %f|' is added to
+                                                       the given command.\cend
   --tempdir <directory>                              \csep Use given existing directory for temporary files.\cend
   --help, -h                                         \csep Print this help and quit.\cend
 \end{options}
