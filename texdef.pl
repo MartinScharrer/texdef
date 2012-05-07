@@ -117,6 +117,8 @@ my $ENDENVSTR   = '%s';
 
 my $VERSION = 'Version 1.7 -- 2012/05/07';
 sub usage {
+    my $option = shift;
+    my $ret    = ($option) ? 0 : 1;
 print << 'EOT';
 texdef -- Show definitions of TeX commands
 Version 1.7 -- 2012/05/07
@@ -207,7 +209,7 @@ List all user level command sequences (macros) defined by the 'xspace' LaTeX pac
     latexdef -l -p xspace
 
 EOT
-  exit (1);
+  exit ($ret);
 }
 
 sub envcode {
