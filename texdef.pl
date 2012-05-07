@@ -167,9 +167,11 @@ Options:
                                   (L) Together with -p or -c prints version of LaTeX package(s) or class, respectively.
   --edit                        : Opens the file holding the macro definition. Uses --Find and --source. (L)
                                   If the source definition can not be found the definition is printed as normal instead.
-  --editor <editor>             : Can be used to set the used editor. Can include '%f' for the filename, '%n' for the
-                                  line number and '%%' for a literal '%'. If no '%' is used '+%n %f' is added to the
-                                  given command.
+  --editor <editor>             : Can be used to set the used editor. If not used the environment variables TEXDEF_EDITOR, EDITOR and
+                                  SELECTED_EDITOR are read in this order. If none of these are set a list of default
+                                  editors are tried.  The <editor> string can include '%f' for the filename, '%n' for
+                                  the line number and '%%' for a literal '%'.  If no '%' is used '+%n %f' is added to
+                                  the given command.
   --tempdir <directory>         : Use given existing directory for temporary files.
   --help, -h                    : Print this help and quit.
 
@@ -253,9 +255,9 @@ GetOptions (
 # usage() unless @ARGV;
 
 if ($EDIT && !$EDITOR) {
-    $EDITOR = $ENV{'EDITOR'} || $ENV{'SELECTED_EDITOR'};
+    $EDITOR = $ENV{'TEXDEF_EDITOR'} || $ENV{'EDITOR'} || $ENV{'SELECTED_EDITOR'};
     if (!$EDITOR) {
-        if (!$WINDOWS) {
+        if (!$WINDOWS and exists $ENV{HOME}) {
         # Check ~/.selected_editor file (Ubuntu)
         my $fn = "$ENV{HOME}/.selected_editor";
         if (-r $fn) {
@@ -276,10 +278,18 @@ if ($EDIT && !$EDITOR) {
             $EDITOR = 'notepad "%f"';
         }
         else {
-            for my $ed (qw(/usr/bin/editor /usr/bin/vim /usr/bin/emacs /usr/bin/nano)) {
+            for my $ed (qw(/usr/bin/vim /usr/bin/emacs /usr/bin/nano)) {
                 if (-x $ed) {
                     $EDITOR = $ed;
                     last;
+                }
+            }
+            if (!$EDITOR) {
+                for my $ed (qw(/usr/bin/editor /usr/bin/open /bin/open)) {
+                    if (-x $ed) {
+                        $EDITOR = "$ed \"%f\"";
+                        last;
+                    }
                 }
             }
         }
