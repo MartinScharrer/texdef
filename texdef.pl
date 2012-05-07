@@ -257,7 +257,7 @@ GetOptions (
 if ($EDIT && !$EDITOR) {
     $EDITOR = $ENV{'TEXDEF_EDITOR'} || $ENV{'EDITOR'} || $ENV{'SELECTED_EDITOR'};
     if (!$EDITOR) {
-        if (!$WINDOWS and exists $ENV{HOME}) {
+        if (!$WINDOWS && exists $ENV{HOME}) {
         # Check ~/.selected_editor file (Ubuntu)
         my $fn = "$ENV{HOME}/.selected_editor";
         if (-r $fn) {
@@ -275,7 +275,7 @@ if ($EDIT && !$EDITOR) {
     if (!$EDITOR) {
         warn "No editor set. Using default!\n";
         if ($WINDOWS) {
-            $EDITOR = 'notepad "%f"';
+            $EDITOR = 'texworks "%f"';
         }
         else {
             for my $ed (qw(/usr/bin/vim /usr/bin/emacs /usr/bin/nano)) {
