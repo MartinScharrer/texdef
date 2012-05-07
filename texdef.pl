@@ -50,6 +50,9 @@ my $PGFKEYS      = 0;
 my $PGFKEYSPLAIN = 0;
 my $FAKECMD    = "\0FAKECOMMAND\0";
 my $EDIT = 0;
+my $EDITOR;
+my $EDITORCMDLN;
+my $EDITORNOLN = 0;
 my @ENVCODE = ();
 my %DEFS;
 my $LISTSTR = '@TEXDEF@LISTDEFS@'; # used as a dummy command to list definitions
@@ -57,6 +60,9 @@ my @FILES; # List of files (sty, cls, ...)
 my @FILEORDER; # Order of files
 my %ALIAS; # list of aliases; required for registers
 my $currfile = ''; # current file name
+# Operating system:
+my $OS = $^O;
+my $WINDOWS = ($OS =~ /MSWin/);
 
 my @IGNOREDEFREG = (# List of definitions to be ignored. Can be a regex or string
    qr/^ver\@.*\.(?:sty|cls)$/,
@@ -237,9 +243,47 @@ GetOptions (
    'pgf-keys|k' => \$PGFKEYS,
    'pgf-Keys|K' => \$PGFKEYSPLAIN,
    'edit!' => sub { $EDIT=1; $FINDDEF = 2; $PRINTORIGDEF = 1; },
+   'editor=s' => \$EDITOR,
 ) || usage();
 
 # usage() unless @ARGV;
+
+if ($EDIT && !$EDITOR) {
+    $EDITOR = $ENV{'EDITOR'} || $ENV{'SELECTED_EDITOR'};
+    if (!$EDITOR) {
+        # Check ~/.selected_editor file (Ubuntu)
+        my $fn = "$ENV{HOME}/.selected_editor";
+        if (-r $fn) {
+            open (my $fh, '<', $fn);
+            while (<$fh>) {
+                s/#.*//;
+                if (/^\s*SELECTED_EDITOR=(["']?)(.*)\1/) {
+                    $EDITOR=$2;
+                }
+            }
+            close ($fh);
+        }
+    }
+    if (!$EDITOR) {
+        warn "No editor set. Using default!\n";
+        if ($WINDOWS) {
+            $EDITOR = 'notepad';
+            $EDITORNOLN = 1;
+        }
+        else {
+            for my $ed (qw(/usr/bin/editor /usr/bin/vim /usr/bin/emacs /usr/bin/nano)) {
+                if (-x $ed) {
+                    $EDITOR = $ed;
+                    last;
+                }
+            }
+        }
+    }
+    if (!$EDITOR) {
+        warn "No suitable editor found. Disable editing!\n";
+        $EDIT = 0;
+    }
+}
 
 ## Format specific settings
 if ($TEX =~ /latex$/) {
@@ -297,9 +341,8 @@ sub print_versions {
 usage() if not @cmds;
 
 my $cwd = getcwd();
-my $OS = $^O;
 my $DIRSEP;
-if ($OS =~ /MSWin/) {
+if ($WINDOWS) {
     $DIRSEP = ';';
 } else {
     $DIRSEP = ':';
@@ -578,17 +621,12 @@ sub env_braces {
 sub call_editor {
     my $path = shift;
     my $linenumber = shift;
-    my $editor = $ENV{'EDITOR'} || $ENV{'SELECTED_EDITOR'};
-    if (!$editor) {
-        warn "No editor set. Using default!\n";
-        $editor = '/usr/bin/editor';
-    }
     print "Opening file '$path', line $linenumber.\n";
-   #my $id = fork;
-   #if (!$id) {
-        system($editor, "+$linenumber", $path);
-   #    exit(0);
-   #}
+    if ($EDITORNOLN) {
+        system($EDITOR, $path);
+    } else {
+        system($EDITOR, "+$linenumber", $path);
+    }
 }
 
 sub print_orig_def {
