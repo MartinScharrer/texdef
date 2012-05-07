@@ -581,14 +581,14 @@ sub call_editor {
     my $editor = $ENV{'EDITOR'} || $ENV{'SELECTED_EDITOR'};
     if (!$editor) {
         warn "No editor set. Using default!\n";
-        $editor = "vim";
+        $editor = '/usr/bin/editor';
     }
-    print "Opening file '$path', line '$linenumber'.\n";
-    my $id = fork;
-    if ($id) {
+    print "Opening file '$path', line $linenumber.\n";
+   #my $id = fork;
+   #if (!$id) {
         system($editor, "+$linenumber", $path);
-    }
-    exit 0;
+   #    exit(0);
+   #}
 }
 
 sub print_orig_def {
@@ -640,7 +640,7 @@ sub print_orig_def {
             $linenumber = $.;
             if ($EDIT) {
                 call_editor($path, $linenumber);
-                return $found;
+                last;
             }
             print "% $file, line $linenumber:\n";
             print $line;
@@ -663,7 +663,7 @@ sub print_orig_def {
             $linenumber = $.;
             if ($EDIT) {
                 call_editor($path, $linenumber);
-                return $found;
+                last;
             }
             print "% $file, line $linenumber:\n";
             print $line;
@@ -676,7 +676,7 @@ sub print_orig_def {
             $linenumber = $.;
             if ($EDIT) {
                 call_editor($path, $linenumber);
-                return $found;
+                last;
             }
             print "% $file, line $linenumber:\n";
             print $line;
@@ -823,6 +823,8 @@ if ($error) {
   }
   next;
 }
+
+#last if $PRINTORIGDEF && $origdeffound && $EDIT;
 
 next if $cmd eq $FAKECMD;
 if ($cmd eq $LISTSTR) {
