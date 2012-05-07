@@ -49,6 +49,7 @@ my $BEFORECLASS = 0;
 my $PGFKEYS      = 0;
 my $PGFKEYSPLAIN = 0;
 my $FAKECMD    = "\0FAKECOMMAND\0";
+my $EDIT = 0;
 my @ENVCODE = ();
 my %DEFS;
 my $LISTSTR = '@TEXDEF@LISTDEFS@'; # used as a dummy command to list definitions
@@ -235,6 +236,7 @@ GetOptions (
    'help|h' => \&usage,
    'pgf-keys|k' => \$PGFKEYS,
    'pgf-Keys|K' => \$PGFKEYSPLAIN,
+   'edit!' => sub { $EDIT=1; $FINDDEF = 2; $PRINTORIGDEF = 1; },
 ) || usage();
 
 # usage() unless @ARGV;
@@ -573,10 +575,27 @@ sub env_braces {
     return ($level, $count);
 }
 
+sub call_editor {
+    my $path = shift;
+    my $linenumber = shift;
+    my $editor = $ENV{'EDITOR'} || $ENV{'SELECTED_EDITOR'};
+    if (!$editor) {
+        warn "No editor set. Using default!\n";
+        $editor = "vim";
+    }
+    print "Opening file '$path', line '$linenumber'.\n";
+    my $id = fork;
+    if ($id) {
+        system($editor, "+$linenumber", $path);
+    }
+    exit 0;
+}
+
 sub print_orig_def {
     my $rmacroname = shift;
     my $file = shift;
     my $path = shift;
+    my $linenumber;
     my $found = 0;
     open (my $fh, '<', $path) or return;
     my $rmacrodef  = qr/
@@ -618,7 +637,12 @@ sub print_orig_def {
     while (my $line = <$fh>) {
         if ($line =~ $rmacrodef) {
             $found = 1;
-            print "% $file, line $.:\n";
+            $linenumber = $.;
+            if ($EDIT) {
+                call_editor($path, $linenumber);
+                return $found;
+            }
+            print "% $file, line $linenumber:\n";
             print $line;
             remove_invalid_braces $line;
             my $obrace = $line =~ tr/{/{/;
@@ -636,7 +660,12 @@ sub print_orig_def {
         elsif ($line =~ $rmacrolet) {
             my $letcmd = $1;
             $found = 1;
-            print "% $file, line $.:\n";
+            $linenumber = $.;
+            if ($EDIT) {
+                call_editor($path, $linenumber);
+                return $found;
+            }
+            print "% $file, line $linenumber:\n";
             print $line;
             print "\n";
             unshift @cmds, $letcmd;
@@ -644,7 +673,12 @@ sub print_orig_def {
         }
         elsif ($line =~ $renvdef) {
             $found = 2;
-            print "% $file, line $.:\n";
+            $linenumber = $.;
+            if ($EDIT) {
+                call_editor($path, $linenumber);
+                return $found;
+            }
+            print "% $file, line $linenumber:\n";
             print $line;
             my ($level, $count) = env_braces $line;
             while ($count < 3) {
