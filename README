@@ -1,8 +1,5 @@
 texdef -- Show definitions of TeX commands
-
-This perl script shows the definition of (La)TeX commands in a similar way as `\show`.
-
-Version 1.6 -- 2012/05/02
+Version 1.7 -- 2012/05/07
 Copyright (C) 2011-2012  Martin Scharrer <martin@scharrer-online.de>
 This program comes with ABSOLUTELY NO WARRANTY;
 This is free software, and you are welcome to redistribute it under certain conditions;
@@ -17,6 +14,7 @@ Options:
   --tex <format>, -t <format>   : Use given format of TeX: 'tex', 'latex', 'context'.
                                   Variations of 'tex' and 'latex', like 'luatex', 'lualatex', 'xetex', 'xelatex' are supported.
                                   The default is given by the used program name: 'texdef' -> 'tex', 'latexdef' -> 'latex', etc.
+  --source, -s                  : Try to show the original source code of the command definition (L).
   --value, -v                   : Show value of command instead (i.e. \the\command).
   --Environment, -E             : Every command name is taken as an environment name. This will show the definition of
                                   both \Macro\foo and \Macro\endfoo if \texttt{foo} is used as command name (L).
@@ -37,7 +35,6 @@ Options:
                                   The <code> can be arbitray TeX code and doesn't need be be balanced.
   --find, -f                    : Find file where the command sequence was defined (L).
   --Find, -F                    : Show full filepath of the file where the command sequence was defined (L).
-  --source, -s                  : Try to show the original source code of the command definition (L).
   --list, -l                    : List user level command sequences of the given packages (L).
   --list-defs, -L               : List user level command sequences and their shorten definitions of the given packages (L).
   --list-all, -ll               : List all command sequences of the given packages (L).
@@ -48,6 +45,13 @@ Options:
   --pgf-Keys, -K                : Takes commands as pgfkeys and displays their definitions. Keys must use the full path.
   --version, -V                 : If used alone prints version of this script.
                                   (L) Together with -p or -c prints version of LaTeX package(s) or class, respectively.
+  --edit                        : Opens the file holding the macro definition. Uses --Find and --source. (L)
+                                  If the source definition can not be found the definition is printed as normal instead.
+  --editor <editor>             : Can be used to set the used editor. If not used the environment variables TEXDEF_EDITOR, EDITOR and
+                                  SELECTED_EDITOR are read in this order. If none of these are set a list of default
+                                  editors are tried.  The <editor> string can include '%f' for the filename, '%n' for
+                                  the line number and '%%' for a literal '%'.  If no '%' is used '+%n %f' is added to
+                                  the given command.
   --tempdir <directory>         : Use given existing directory for temporary files.
   --help, -h                    : Print this help and quit.
 

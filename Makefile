@@ -45,6 +45,9 @@ build: doc
 	latexmk -pdf $<
 	touch $@
 
+README: texdef.pl
+	./texdef.pl --help > README
+
 clean:
 	latexmk -C ${SCRSRCFILES}
 	${RM} ${CLEANFILES}
