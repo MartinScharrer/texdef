@@ -464,7 +464,9 @@ if ($ISLATEX) {
     #print "\\nofiles\n";
     if ($FINDDEF || $LISTCMD || $PRINTORIGDEF) {
         # Load the 'filehook' and 'currfile' packages without 'kvoptions' by providing dummy definitions for the 'currfile' options:
-        print '\makeatletter\expandafter\def\csname ver@kvoptions.sty\endcsname{0000/00/00}\let\SetupKeyvalOptions\@gobble\newcommand\DeclareBoolOption[2][]{}\let\DeclareStringOption\DeclareBoolOption';
+        print '\makeatletter\expandafter\def\csname ver@kvoptions.sty\endcsname{0000/00/00}\let\SetupKeyvalOptions\@gobble';
+        print '\newcommand\DeclareStringOption[2][]{}';
+        print '\newcommand\DeclareBoolOption[2][false]{\expandafter\newif\csname ifcurrfile@#2\endcsname\csname currfile@#2#1\endcsname}';
         print '\let\DeclareVoidOption\@gobbletwo\def\ProcessKeyvalOptions{\@ifstar{}{}}';
         print '\def\currfile@mainext{tex}\def\currfile@maindir{\@currdir}\let\ifcurrfile@fink\iffalse\makeatother';
         print "\\RequirePackage{filehook}\n";
