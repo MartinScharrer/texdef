@@ -674,7 +674,7 @@ sub print_orig_def {
         (?:(?:\\global|\\long|\\protected|\\outer)\s*)*       # Prefixes (maybe with whitespace between them)
         )
         \\(
-            [gex]?def \s* \\                                   # TeX definitions
+              (?:[gex]?def|newcount|newif) \s* \\                # TeX definitions
             | (?:new|renew|provide)command\s* \*? \s* {? \s* \\  # LaTeX definitions
             | (?:new|renew|provide)robustcmd\s* \*? \s* {? \s* \\  # etoolbox definitions
             | \@namedef{?                                        # Definition by name only
@@ -686,17 +686,14 @@ sub print_orig_def {
         /xms;
     my $rmacrolet  = qr/
         ^                                                        # Begin of line (no whitespaces!)
-        \s*
-        (?:
-        (?:(?:\\global)\s*)*       # Prefixes (maybe with whitespace between them)
-        )
+        (?:global\s*)?                                           # Prefixes (maybe with whitespace between them)
         \\let \s* \\                                             # let
         $rmacroname                                              # Macro name without backslash
         \s* =?                                                   # Optional '='
         \s* \\ ([a-zA-Z@]+)                                      # Second macro
         /xms;
     my $renvdef = qr/
-        ^\s*                                                     # Begin of line (no whitespaces!)
+        ^                                                        # Begin of line (no whitespaces!)
         \\(
             (?:new|renew|provide)environment\s* { \s*            # LaTeX definitions
         )
@@ -706,6 +703,7 @@ sub print_orig_def {
         /xms;
     while (my $line = <$fh>) {
         if ($line =~ $rmacrodef) {
+            my $defcmd = $1;
             $found = 1;
             $linenumber = $.;
             if ($EDIT) {
@@ -714,6 +712,7 @@ sub print_orig_def {
             }
             print "% $file, line $linenumber:\n";
             print $line;
+            last if $defcmd eq 'newcount' or $defcmd eq 'newif';
             remove_invalid_braces $line;
             my $obrace = $line =~ tr/{/{/;
             my $cbrace = $line =~ tr/}/}/;
