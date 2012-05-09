@@ -674,7 +674,8 @@ sub print_orig_def {
         (?:(?:\\global|\\long|\\protected|\\outer)\s*)*       # Prefixes (maybe with whitespace between them)
         )
         \\(
-              (?:[gex]?def|newcount|newif) \s* \\                # TeX definitions
+              (?:[gex]?def) \s* \\                               # TeX definitions
+            | (?:new(?:box|count|dimen|if|insert|read|skip|toks|write)) \s* \\ # TeX registers etc.
             | (?:new|renew|provide)command\s* \*? \s* {? \s* \\  # LaTeX definitions
             | (?:new|renew|provide)robustcmd\s* \*? \s* {? \s* \\  # etoolbox definitions
             | \@namedef{?                                        # Definition by name only
@@ -712,7 +713,7 @@ sub print_orig_def {
             }
             print "% $file, line $linenumber:\n";
             print $line;
-            last if $defcmd eq 'newcount' or $defcmd eq 'newif';
+            last if $defcmd =~ /^(?:new(?:box|count|dimen|if|insert|read|skip|toks|write))/;
             remove_invalid_braces $line;
             my $obrace = $line =~ tr/{/{/;
             my $cbrace = $line =~ tr/}/}/;
