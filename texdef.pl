@@ -115,13 +115,13 @@ my $ISCONTEXT = 0;
 my $BEGINENVSTR = '%s';
 my $ENDENVSTR   = '%s';
 
-my $VERSION = 'Version 1.7a -- 2012/05/08';
+my $VERSION = 'Version 1.7b -- 2012/05/15';
 sub usage {
     my $option = shift;
     my $ret    = ($option) ? 0 : 1;
 print << 'EOT';
 texdef -- Show definitions of TeX commands
-Version 1.7a -- 2012/05/08
+Version 1.7b -- 2012/05/15
 Copyright (C) 2011-2012  Martin Scharrer <martin@scharrer-online.de>
 This program comes with ABSOLUTELY NO WARRANTY;
 This is free software, and you are welcome to redistribute it under certain conditions;
