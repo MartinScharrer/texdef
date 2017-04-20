@@ -388,10 +388,10 @@ sub testdef {
             my $protectedmacro = $2;
             unshift @cmds, $protectedmacro;
         }
-        elsif ($macrodef =~ /^\\\@protected\@testopt {?\\.*? }? *(\\\\.*?) /) {
+        elsif ($macrodef =~ /^\\\@protected\@testopt \{?\\.*? \}? *(\\\\.*?) /) {
             unshift @cmds, $1;
         }
-        elsif ($macrodef =~ /^\\\@testopt {?(\\.*?) }?/) {
+        elsif ($macrodef =~ /^\\\@testopt \{?(\\.*?) \}?/) {
             unshift @cmds, $1;
         }
     }
