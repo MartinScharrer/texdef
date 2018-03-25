@@ -17,3 +17,6 @@ temp/*
 texput.*
 *.tdy
 *.bak*
+texdef.fdb_latexmk
+texdef.fls
+texdef.toc
