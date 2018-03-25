@@ -322,6 +322,11 @@ elsif ($TEX =~ /context$/) {
   $ENDENVSTR   = '\stop%s'  . "\n";
 }
 
+if ($TEX =~ /^dvi((la)?tex)$/) {
+  $TEX = $1;
+  $TEXOPTIONS .= ' -output-format=dvi '
+}
+
 $USERCLASS = $CLASS;
 $CLASS = 'article' if not $CLASS;
 $CLASS =~ /^(?:\[(.*)\])?\{?(.*?)\}?$/;
