@@ -324,7 +324,7 @@ elsif ($TEX =~ /context$/) {
 
 $USERCLASS = $CLASS;
 $CLASS = 'article' if not $CLASS;
-$CLASS =~ /^(?:\[(.*)\])?{?(.*?)}?$/;
+$CLASS =~ /^(?:\[(.*)\])?\{?(.*?)\}?$/;
 $CLASS = $2;
 my $CLASSOPTIONS = $1 || '';
 
@@ -506,7 +506,7 @@ if ($ISLATEX) {
         }
 
         foreach my $pkg (@PACKAGES) {
-            $pkg =~ /^(?:\[(.*)\])?{?(.*?)}?$/;
+            $pkg =~ /^(?:\[(.*)\])?\{?(.*?)\}?$/;
             my ($pkgname,$pkgoptions) = ($2, $1 || '');
             print "\\usepackage[$pkgoptions]{$pkgname}\n";
         }
@@ -626,7 +626,7 @@ select STDOUT;
 sub remove_invalid_braces {
     $_[0] =~ s/\\[\\%]//g; # remove \\ and \%
     $_[0] =~ s/%.*$//;     # remove line comments
-    $_[0] =~ s/\\[{}]//g;  # remove \{ and \}
+    $_[0] =~ s/\\[\{\}]//g;  # remove \{ and \}
 }
 
 sub env_braces {
