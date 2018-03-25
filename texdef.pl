@@ -148,7 +148,7 @@ Options:
                                   or 'context' is used. For LaTeX the <pkg> can start with `[<options>]` and end 
                                   with `<pkgname>` or `{<pkgname>}`.
   --class <class>, -c <class>   : (LaTeX only) Load given class instead of default ('article').
-                                  The <class> can start with `[<classs options>]` and end 
+                                  The <class> can start with `[<class options>]` and end 
                                   with `<classname>` or `{<classname>}`.
   --environment <env>, -e <env> : (M) Show definition inside the given environment <env>.
   --othercode <code>, -o <code> : (M) Add other code into the preamble before the definition is shown.
