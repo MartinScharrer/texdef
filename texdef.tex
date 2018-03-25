@@ -199,5 +199,72 @@ latexdef -l -p xspace
 \end{verbatim}
 
 
+\section{Changelog}
+
+
+\subsection*{v1.8 from 2018/03/25}
+\begin{itemize}
+ \item Added "dvitex" and "dvilatex" as formats. These will set DVI mode on "tex" or "latex".
+ \item Escaped further braces in regexs to avoid warnings or errors.
+ \item Added option "--texoptions" to allow the passing of compiler options for special cases.
+\end{itemize}
+
+\subsection*{v1.7c from 2017/12/09}
+\begin{itemize}
+ \item Fixed 'Unescaped left brace in regex is deprecated' warning.
+   Thanks goes to Paulo Cereda <cereda.paulo@gmail.com> for providing the patch.
+\end{itemize}
+
+\subsection*{v1.7b from 2012/05/15}
+\begin{itemize}
+ \item Added support for \Macro\chardef, \Macro\countdef, \Macro\dimendef, \Macro\mathchardef, \Macro\myskip, \Macro\skipdef and \Macro\toksdef.
+ \item Added support for \Macro\newbox, \Macro\newcount, \Macro\newdimen, \Macro\newif, \Macro\newinsert, \Macro\newread, \Macro\newskip, \Macro\newtoks, \Macro\newwrite.
+ \item Added support for \Macro\newif and \Macro\newcount.
+ \item Changed internal processing order to put more frequently used elements first.
+\end{itemize}
+
+\subsection*{v1.7a from 2012/05/08}
+\begin{itemize}
+ \item Fix for currfile v0.6.
+\end{itemize}
+
+\subsection*{v1.7 from 2012/05/07}
+\begin{itemize}
+ \item Changed "--help" to return status code 0.
+ \item Changed Windows default editor to texworks. Fixed If-statement.
+ \item Fixed bug which reported name of included subpackages.
+ \item Added option "--edit".
+ \item Added "--editor" option and better editor handling.
+ \item Added variable substitution for editor.
+ \item Added support for "TEXDEF_EDITOR" variable. Added Mac "open" command.
+ \item Fixed for behaviour when -s is used (correct name in message; do not follow protected macros etc.)
+\end{itemize}
+
+\subsection*{v1.6 from 2012/05/02}
+\begin{itemize}
+ \item Changed implementation of -E option to work better with new environment source code.
+ \item Added code to detect environment source definitions.
+ \item Added -E option.
+ \item Changed "flavour" to "format".
+ \item Added support for \Macro\let.
+ \item Added fallback for when the source code can not be found. Added support for -F with "latex.ltx".
+\end{itemize}
+
+\subsection*{v1.5 from 2012/04/29}
+\begin{itemize}
+ \item Added experimental --source option to show source code of the definitions.
+ \item Script now works correctly under MS Windows.
+\end{itemize}
+
+\subsection*{v1.4 from 2011/07/28}
+\begin{itemize}
+ \item Added -F option to display file path.
+ \item Added basic support for pdfkeys using -k and -K options.
+ \item Added -V option to print version numbers of LaTeX packages or classes.
+ \item Added '--tempdir' option to specify the location of the temporary files. Useful for debugging.
+\end{itemize}
+
+
+
 \end{document}
 
