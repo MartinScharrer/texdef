@@ -1,6 +1,6 @@
 texdef -- Show definitions of TeX commands
-Version 1.7c -- 2017/12/09
-Copyright (C) 2011-2017  Martin Scharrer <martin@scharrer-online.de>
+Version 1.8 -- 2019/03/25
+Copyright (C) 2011-2018  Martin Scharrer <martin@scharrer-online.de>
 This program comes with ABSOLUTELY NO WARRANTY;
 This is free software, and you are welcome to redistribute it under certain conditions;
 
@@ -14,6 +14,7 @@ Options:
   --tex <format>, -t <format>   : Use given format of TeX: 'tex', 'latex', 'context'.
                                   Variations of 'tex' and 'latex', like 'luatex', 'lualatex', 'xetex', 'xelatex' are supported.
                                   The default is given by the used program name: 'texdef' -> 'tex', 'latexdef' -> 'latex', etc.
+  --texoptions <options>        : Call (La)TeX with the given options.
   --source, -s                  : Try to show the original source code of the command definition (L).
   --value, -v                   : Show value of command instead (i.e. \the\command).
   --Environment, -E             : Every command name is taken as an environment name. This will show the definition of
@@ -24,7 +25,7 @@ Options:
                                   or 'context' is used. For LaTeX the <pkg> can start with `[<options>]` and end 
                                   with `<pkgname>` or `{<pkgname>}`.
   --class <class>, -c <class>   : (LaTeX only) Load given class instead of default ('article').
-                                  The <class> can start with `[<classs options>]` and end 
+                                  The <class> can start with `[<class options>]` and end 
                                   with `<classname>` or `{<classname>}`.
   --environment <env>, -e <env> : (M) Show definition inside the given environment <env>.
   --othercode <code>, -o <code> : (M) Add other code into the preamble before the definition is shown.

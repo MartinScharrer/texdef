@@ -1,10 +1,47 @@
 = Changelog =
 
-== v1.5 from  2012/04/29 ==
+
+== v1.8 from 2018/03/25 ==
+ * Added "dvitex" and "dvilatex" as formats. These will set DVI mode on "tex" or "latex".
+ * Escaped further braces in regexs to avoid "Unescaped left brace in regex is deprecated" warnings or errors.
+ * Added option '--texoptions' to allow the passing of compiler options for special cases.
+
+== v1.7c from 2017/12/09 ==
+ * Fixed 'Unescaped left brace in regex is deprecated' warning.
+   Thanks goes to Paulo Cereda <cereda.paulo@gmail.com> for providing the patch.
+
+== v1.7b from 2012/05/15 ==
+ * Added support for \chardef, \countdef, \dimendef, \mathchardef, \myskip, \skipdef and \toksdef.
+ * Added support for \newbox, \newcount, \newdimen, \newif, \newinsert, \newread, \newskip, \newtoks, \newwrite.
+ * Added support for "\newif" and "\newcount".
+ * Changed internal processing order to put more frequently used elements first.
+
+== v1.7a from 2012/05/08 ==
+ * Fix for currfile v0.6.
+
+== v1.7 from 2012/05/07 ==
+ * Changed "--help" to return status code 0.
+ * Changed Windows default editor to texworks. Fixed If-statement.
+ * Fixed bug which reported name of included subpackages.
+ * Added option "--edit".
+ * Added "--editor" option and better editor handling.
+ * Added variable substitution for editor.
+ * Added support for "TEXDEF_EDITOR" variable. Added Mac "open" command.
+ * Fixed for behaviour when -s is used (correct name in message; do not follow protected macros etc.)
+
+== v1.6 from 2012/05/02 ==
+ * Changed implementation of -E option to work better with new environment source code.
+ * Added code to detect environment source definitions.
+ * Added -E option.
+ * Changed "flavour" to "format".
+ * Added support for \let.
+ * Added fallback for when the source code can not be found. Added support for -F with "latex.ltx".
+
+== v1.5 from 2012/04/29 ==
  * Added experimental --source option to show source code of the definitions.
  * Script now works correctly under MS Windows.
 
-== v1.4 from  2011/07/28 ==
+== v1.4 from 2011/07/28 ==
  * Added -F option to display file path.
  * Added basic support for pdfkeys using -k and -K options.
  * Added -V option to print version numbers of LaTeX packages or classes.
