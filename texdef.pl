@@ -30,6 +30,7 @@ if ($scriptname =~ /^(.*)def$/) {
     $TEX = $1;
 }
 my $TEXOPTIONS = " -interaction nonstopmode ";
+my $USERTEXOPTIONS = "";
 
 ## Variables for options and settings
 my $CLASS      = undef;
@@ -136,6 +137,7 @@ Options:
   --tex <format>, -t <format>   : Use given format of TeX: 'tex', 'latex', 'context'.
                                   Variations of 'tex' and 'latex', like 'luatex', 'lualatex', 'xetex', 'xelatex' are supported.
                                   The default is given by the used program name: 'texdef' -> 'tex', 'latexdef' -> 'latex', etc.
+  --texoptions <options>        : Call (La)TeX with the given options.
   --source, -s                  : Try to show the original source code of the command definition (L).
   --value, -v                   : Show value of command instead (i.e. \the\command).
   --Environment, -E             : Every command name is taken as an environment name. This will show the definition of
@@ -247,6 +249,7 @@ GetOptions (
    'before|b=s' => \&envcode,
    'after|a=s' => \&envcode,
    'tex|t=s' => \$TEX,
+   'texoptions=s' => \$USERTEXOPTIONS,
    'help|h' => \&usage,
    'pgf-keys|k' => \$PGFKEYS,
    'pgf-Keys|K' => \$PGFKEYSPLAIN,
@@ -766,7 +769,7 @@ sub print_orig_def {
     return $found;
 }
 
-open (my $texpipe, '-|', "$TEX $TEXOPTIONS \"$TMPFILE\" ");
+open (my $texpipe, '-|', "$TEX $TEXOPTIONS $USERTEXOPTIONS \"$TMPFILE\" ");
 
 my $name = '';
 my $definition = '';
