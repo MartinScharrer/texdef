@@ -679,17 +679,17 @@ sub print_orig_def {
     my $rmacrodef  = qr/
         ^                                                        # Begin of line (no whitespaces!)
         (
-        (?:(?:\\global|\\long|\\protected|\\outer)\s*)*       # Prefixes (maybe with whitespace between them)
+        (?:(?:\\global|\\long|\\protected|\\outer)\s*)*          # Prefixes (maybe with whitespace between them)
         )
         \\(
               (?:[gex]?def) \s* \\                               # TeX definitions
-            | (?:new|renew|provide)command\s* \*? \s* {? \s* \\  # LaTeX definitions
-            | (?:new|renew|provide)robustcmd\s* \*? \s* {? \s* \\  # etoolbox definitions
+            | (?:new|renew|provide)command\s* \*? \s* \{? \s* \\ # LaTeX definitions
+            | (?:new|renew|provide)robustcmd\s* \*? \s* \{? \s* \\ # etoolbox definitions
             | (?:new(?:box|count|dimen|if|insert|read|skip|muskip|toks|write)) \s* \\ # TeX registers etc.
             | (?:char|count|dimen|mathchar|skip|toks)def \s* \\  # TeX chardefs etc.
-            | \@namedef{?                                        # Definition by name only
-            | Declare[a-zA-z]+ \s* \*? \s* {? \s* \\             # Declare... definitions
-            | declare[a-zA-z]+ \s* \*? \s* {? \s* \\             # declare... definitions
+            | \@namedef\{?                                       # Definition by name only
+            | Declare[a-zA-z]+ \s* \*? \s* \{? \s* \\            # Declare... definitions
+            | declare[a-zA-z]+ \s* \*? \s* \{? \s* \\            # declare... definitions
         )
         $rmacroname                                              # Macro name without backslash
         [^a-zA-Z@]
@@ -705,7 +705,7 @@ sub print_orig_def {
     my $renvdef = qr/
         ^                                                        # Begin of line (no whitespaces!)
         \\(
-            (?:new|renew|provide)environment\s* { \s*            # LaTeX definitions
+            (?:new|renew|provide)environment\s* \{ \s*           # LaTeX definitions
         )
         ($rmacroname)                                            # Environment names follow same rules as macro names
         \s* }                                                    # closing brace
