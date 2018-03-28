@@ -116,13 +116,13 @@ my $ISCONTEXT = 0;
 my $BEGINENVSTR = '%s';
 my $ENDENVSTR   = '%s';
 
-my $VERSION = 'Version 1.8 -- 2018/03/25';
+my $VERSION = 'Version 1.8a -- 2018/03/28';
 sub usage {
     my $option = shift;
     my $ret    = ($option) ? 0 : 1;
 print << 'EOT';
 texdef -- Show definitions of TeX commands
-Version 1.8 -- 2019/03/25
+Version 1.8a -- 2019/03/28
 Copyright (C) 2011-2018  Martin Scharrer <martin@scharrer-online.de>
 This program comes with ABSOLUTELY NO WARRANTY;
 This is free software, and you are welcome to redistribute it under certain conditions;

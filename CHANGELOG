@@ -1,5 +1,7 @@
 = Changelog =
 
+== v1.8a from 2018/03/28 ==
+ * Further fixes of braces in regexs to avoid "Unescaped left brace in regex is deprecated" warnings or errors.
 
 == v1.8 from 2018/03/25 ==
  * Added "dvitex" and "dvilatex" as formats. These will set DVI mode on "tex" or "latex".
