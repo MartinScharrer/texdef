@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 ################################################################################
 #  texdef -- Show definitions of TeX commands
-#  Copyright (c) 2011-2012 Martin Scharrer <martin@scharrer-online.de>
+#  Copyright (c) 2011-2019 Martin Scharrer <martin@scharrer-online.de>
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -116,14 +116,14 @@ my $ISCONTEXT = 0;
 my $BEGINENVSTR = '%s';
 my $ENDENVSTR   = '%s';
 
-my $VERSION = 'Version 1.8a -- 2018/03/28';
+my $VERSION = 'Version 1.8c -- 2019/01/15';
 sub usage {
     my $option = shift;
     my $ret    = ($option) ? 0 : 1;
 print << 'EOT';
 texdef -- Show definitions of TeX commands
-Version 1.8a -- 2019/03/28
-Copyright (C) 2011-2018  Martin Scharrer <martin@scharrer-online.de>
+Version 1.8c -- 2019/01/15
+Copyright (C) 2011-2019  Martin Scharrer <martin@scharrer-online.de>
 This program comes with ABSOLUTELY NO WARRANTY;
 This is free software, and you are welcome to redistribute it under certain conditions;
 
@@ -774,6 +774,16 @@ sub print_orig_def {
     return $found;
 }
 
+sub cleanpath {
+    my $path = shift;
+    chomp $path;
+    if ($path =~ /[a-z]:/i) {
+        $path =~ s/\//\\/g;
+    }
+    return $path;
+}
+
+
 open (my $texpipe, '-|', "$TEX $TEXOPTIONS $USERTEXOPTIONS \"$TMPFILE\" ");
 
 my $name = '';
@@ -786,21 +796,20 @@ while (<$texpipe>) {
     my $line = $1;
     if ($FINDDEF == 2) {
         if ($line =~ /first defined in "(.*)"/) {
-            my $path = `kpsewhich "$1"`;
-            chomp $path;
+            my $path = cleanpath(`kpsewhich "$1"`);
             $line =~ s/$1/$path/;
         }
     }
     if ($PRINTORIGDEF) {
         if ($line =~ /first defined in "(.*)"/) {
             my $file = $1;
-            my $path = `kpsewhich "$file"`;
+            my $path = cleanpath(`kpsewhich "$file"`);
             chomp $path;
             $origdeffound = print_orig_def($cmd, $file, $path);
         }
         elsif ($line =~ /is defined by \(La\)TeX./) {
             my $file = 'latex.ltx';
-            my $path = `kpsewhich "$file"`;
+            my $path = cleanpath(`kpsewhich "$file"`);
             chomp $path;
             $file = $path if $FINDDEF > 1;
             $origdeffound = print_orig_def($cmd, $file, $path);

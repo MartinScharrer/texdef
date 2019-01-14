@@ -1,5 +1,9 @@
 = Changelog =
 
+== v1.8c from 2019/01/15 ==
+ * Changed path printing format to native format of the used OS 
+   (e.g. under Windows file paths now habe `\` instead of `/`)
+
 == v1.8a from 2018/03/28 ==
  * Further fixes of braces in regexs to avoid "Unescaped left brace in regex is deprecated" warnings or errors.
 
