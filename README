@@ -1,6 +1,6 @@
 texdef -- Show definitions of TeX commands
-Version 1.8b -- 2019/01/15
-Copyright (C) 2011-2019  Martin Scharrer <martin@scharrer-online.de>
+Version 1.9 -- 2020/09/27
+Copyright (C) 2011-2020  Martin Scharrer <martin@scharrer-online.de>
 This program comes with ABSOLUTELY NO WARRANTY;
 This is free software, and you are welcome to redistribute it under certain conditions;
 
@@ -13,6 +13,7 @@ Other program names are possible. See the 'tex' option.  Command names do not ne
 Options:
   --tex <format>, -t <format>   : Use given format of TeX: 'tex', 'latex', 'context'.
                                   Variations of 'tex' and 'latex', like 'luatex', 'lualatex', 'xetex', 'xelatex' are supported.
+                                  The postfix '-dev' for develop versions of the format is also supported (e.g. 'latex-dev').
                                   The default is given by the used program name: 'texdef' -> 'tex', 'latexdef' -> 'latex', etc.
   --texoptions <options>        : Call (La)TeX with the given options.
   --source, -s                  : Try to show the original source code of the command definition (L).

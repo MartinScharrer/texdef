@@ -4,8 +4,8 @@
 \title{The \textsf{texdef} script}
 \author{Martin Scharrer}
 \email{martin@scharrer-online.de}
-\repository{https://bitbucket.org/martin_scharrer/texdef}
-\date{Version 1.8b -- 2019/01/15}
+\repository{https://sourceforge.net/projects/texdef/}
+\date{Version 1.9 -- 2020/09/27}
 
 \makeatletter
 \DeclareRobustCommand{\LATeX}{%
@@ -53,6 +53,7 @@ The following options can be used:
 \begin{options}
   --tex \MacroArgs<format>, -t \MacroArgs<format>    \csep Use given format of TeX: 'tex', 'latex', 'context'.
                                                        Variations of 'tex' and 'latex', like 'luatex', 'lualatex', 'xetex', 'xelatex' are supported.
+                                                       The postfix '-dev' for develop versions of the format is also supported (e.g. 'latex-dev').
                                                        The default is given by the used program name: 'texdef' -> 'tex', 'latexdef' -> 'latex', etc.\cend
   --texoptions \MacroArgs<options>                   \csep Call \LaTeX/\TeX{} with the given options.\cend
   --source, -s                                       \csep Try to show the original source code of the command definition (L).\cend
@@ -200,6 +201,11 @@ latexdef -l -p xspace
 
 
 \section{Changelog}
+
+\subsection*{v1.9 from 2020/09/27}
+\begin{itemize}
+ \item Added support for develop versions of the formats, e.g.\ "latex-dev".
+\end{itemize}
 
 \subsection*{v1.8a from 2018/03/28}
 \begin{itemize}

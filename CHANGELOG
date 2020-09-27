@@ -1,5 +1,8 @@
 = Changelog =
 
+== v1.9 from 2020/09/27 ==
+ * Added support for develop versions of formats, e.g. 'latex-dev'.
+
 == v1.8c from 2019/01/15 ==
  * Changed path printing format to native format of the used OS 
    (e.g. under Windows file paths now habe `\` instead of `/`)

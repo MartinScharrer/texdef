@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 ################################################################################
 #  texdef -- Show definitions of TeX commands
-#  Copyright (c) 2011-2019 Martin Scharrer <martin@scharrer-online.de>
+#  Copyright (c) 2011-2020 Martin Scharrer <martin@scharrer-online.de>
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -116,14 +116,14 @@ my $ISCONTEXT = 0;
 my $BEGINENVSTR = '%s';
 my $ENDENVSTR   = '%s';
 
-my $VERSION = 'Version 1.8c -- 2019/01/15';
+my $VERSION = 'Version 1.9 -- 2020/09/27';
 sub usage {
     my $option = shift;
     my $ret    = ($option) ? 0 : 1;
 print << 'EOT';
 texdef -- Show definitions of TeX commands
-Version 1.8c -- 2019/01/15
-Copyright (C) 2011-2019  Martin Scharrer <martin@scharrer-online.de>
+Version 1.9 -- 2020/09/27
+Copyright (C) 2011-2020  Martin Scharrer <martin@scharrer-online.de>
 This program comes with ABSOLUTELY NO WARRANTY;
 This is free software, and you are welcome to redistribute it under certain conditions;
 
@@ -136,6 +136,7 @@ Other program names are possible. See the 'tex' option.  Command names do not ne
 Options:
   --tex <format>, -t <format>   : Use given format of TeX: 'tex', 'latex', 'context'.
                                   Variations of 'tex' and 'latex', like 'luatex', 'lualatex', 'xetex', 'xelatex' are supported.
+                                  The postfix '-dev' for develop versions of the format is also supported (e.g. 'latex-dev').
                                   The default is given by the used program name: 'texdef' -> 'tex', 'latexdef' -> 'latex', etc.
   --texoptions <options>        : Call (La)TeX with the given options.
   --source, -s                  : Try to show the original source code of the command definition (L).
@@ -306,23 +307,23 @@ if ($EDIT && !$EDITOR) {
 }
 
 ## Format specific settings
-if ($TEX =~ /latex$/) {
+if ($TEX =~ /latex(?:-dev)?$/) {
   $ISLATEX = 1;
   $BEGINENVSTR = '\begin{%s}' . "\n";
   $ENDENVSTR   = '\end{%s}'   . "\n";
 }
-elsif ($TEX =~ /tex$/) {
+elsif ($TEX =~ /tex(?:-dev)?$/) {
   $ISTEX   = 1;
   $BEGINENVSTR = '\%s' . "\n";
   $ENDENVSTR   = '\end%s' . "\n";
 }
-elsif ($TEX =~ /context$/) {
+elsif ($TEX =~ /context(?:-dev)?$/) {
   $ISCONTEXT = 1;
   $BEGINENVSTR = '\start%s' . "\n";
   $ENDENVSTR   = '\stop%s'  . "\n";
 }
 
-if ($TEX =~ /^dvi((la)?tex)$/) {
+if ($TEX =~ /^dvi((la)?tex)(?:-dev)?$/) {
   $TEX = $1;
   $TEXOPTIONS .= ' -output-format=dvi '
 }
