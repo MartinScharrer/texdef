@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 ################################################################################
 #  texdef -- Show definitions of TeX commands
-#  Copyright (c) 2011-2020 Martin Scharrer <martin@scharrer-online.de>
+#  Copyright (c) 2011-2022 Martin Scharrer <martin.scharrer@web.de>
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -123,7 +123,7 @@ sub usage {
 print << 'EOT';
 texdef -- Show definitions of TeX commands
 Version 1.9 -- 2020/09/27
-Copyright (C) 2011-2020  Martin Scharrer <martin@scharrer-online.de>
+Copyright (c) 2011-2022  Martin Scharrer <martin.scharrer@web.de>
 This program comes with ABSOLUTELY NO WARRANTY;
 This is free software, and you are welcome to redistribute it under certain conditions;
 

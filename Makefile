@@ -1,6 +1,6 @@
 CONTRIBUTION  = texdef
 NAME          = Martin Scharrer
-EMAIL         = martin@scharrer-online.de
+EMAIL         = martin.scharrer@web.de
 DIRECTORY     = /support/${CONTRIBUTION}
 LICENSE       = free
 FREEVERSION   = gpl
