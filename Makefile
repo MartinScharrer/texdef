@@ -7,10 +7,11 @@ FREEVERSION   = gpl
 CTAN_FILE     = ${CONTRIBUTION}.zip
 export CONTRIBUTION VERSION NAME EMAIL SUMMARY DIRECTORY DONOTANNOUNCE ANNOUNCE NOTES LICENSE FREEVERSION CTAN_FILE CTAN_SERVER
 
+README        = README.txt
 SCRIPTFILES   = ${CONTRIBUTION}.pl
-SCRDOCFILES   = ${CONTRIBUTION}.pdf README INSTALL CHANGELOG
+SCRDOCFILES   = ${CONTRIBUTION}.pdf ${README} INSTALL.txt CHANGELOG.txt
 SCRSRCFILES   = ${CONTRIBUTION}.tex
-CTANFILES     = ${SCRIPTFILES} ${SCRDOCFILES} ${SCRSRCFILES}
+CTANFILES     = ${SCRIPTFILES} ${SCRDOCFILES} ${SCRSRCFILES} DEPENDS.txt
 
 TDSZIP      = ${CONTRIBUTION}.tds.zip
 
@@ -47,8 +48,8 @@ build: doc
 	latexmk -pdf $<
 	touch $@
 
-README: texdef.pl
-	./texdef.pl --help > README
+${README}: texdef.pl
+	./texdef.pl --help > ${README}
 
 clean:
 	latexmk -C ${SCRSRCFILES}
@@ -63,7 +64,7 @@ distclean:
 
 CPORLN=cp
 
-installtds: uninstall ${TDSFILES}
+installtds: ${TDSFILES}
 ifneq ($(strip $(SCRIPTFILES)),)
 	test -d "${SCRIPTDIR}" || mkdir -p "${SCRIPTDIR}"
 	${CPORLN} ${SCRIPTFILES} "$(abspath ${SCRIPTDIR})"
