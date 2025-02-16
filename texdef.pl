@@ -222,7 +222,7 @@ sub envcode {
 }
 
 ## Define and process options
-Getopt::Long::Configure ("bundling");
+Getopt::Long::Configure ("bundling","no_ignore_case");
 GetOptions (
    'value|v!' => \$SHOWVALUE,
    'Environment|E!' => \$ISENVIRONMENT,
