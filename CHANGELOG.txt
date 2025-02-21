@@ -1,5 +1,8 @@
 = Changelog =
 
+== v1.10 from 2025/02/17 ==
+ * Added support for current versions of Perl.
+
 == v1.9 from 2020/09/27 ==
  * Added support for develop versions of formats, e.g. 'latex-dev'.
 
